@@ -16,10 +16,10 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-gray-800;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-black text-white;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
