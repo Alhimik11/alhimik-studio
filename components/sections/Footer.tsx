@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 export function Footer() {
@@ -12,11 +13,18 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">A</span>
+            <div className="flex items-center space-x-3">
+              <div className="relative w-10 h-10">
+                <Image
+                  src="/logo.png"
+                  alt="Alhimik Studio"
+                  fill
+                  className="object-contain"
+                />
               </div>
-              <span className="text-xl font-display font-bold">Alhimik Studio</span>
+              <span className="text-xl font-display font-bold bg-gradient-to-r from-accent-500 to-primary-500 bg-clip-text text-transparent">
+                Alhimik Studio
+              </span>
             </div>
             <p className="text-gray-400 text-sm">
               Создаем будущее с помощью VR/AR/MR, 3D-визуализации и BIM-технологий.

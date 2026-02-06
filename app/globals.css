@@ -16,10 +16,10 @@
 
 @layer base {
   * {
-    @apply border-gray-200;
+    @apply border-border;
   }
   body {
-    @apply bg-black text-white;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -45,17 +45,17 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0ea5e9;
+  background: linear-gradient(180deg, #a855f7 0%, #d4af37 100%);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0284c7;
+  background: linear-gradient(180deg, #9333ea 0%, #c9a02d 100%);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #0ea5e9 0%, #d946ef 100%);
+  background: linear-gradient(135deg, #a855f7 0%, #d4af37 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

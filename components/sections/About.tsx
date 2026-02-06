@@ -95,7 +95,7 @@ export function About() {
         <div className="mt-20 glass rounded-3xl p-12 text-center max-w-4xl mx-auto">
           <blockquote className="space-y-6">
             <p className="text-2xl md:text-3xl font-display italic text-gray-200">
-               Мы не просто адаптируемся к будущему — мы создаем его
+              Мы не просто адаптируемся к будущему — мы создаем его
             </p>
             <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-accent-500 mx-auto" />
             <p className="text-gray-400">
