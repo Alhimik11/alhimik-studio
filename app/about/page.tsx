@@ -175,11 +175,10 @@ export default function AboutPage() {
       <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto glass rounded-3xl p-12 text-center space-y-6">
-            <div className="text-6xl mb-6">"</div>
             <blockquote className="space-y-6">
-              <p className="text-2xl md:text-3xl font-display italic text-gray-200">
-                Мы не просто адаптируемся к будущему — мы создаем его
-              </p>
+  <p className="text-2xl md:text-3xl font-display italic text-gray-200">
+    Мы не просто адаптируемся к будущему — мы создаем его
+  </p>
               <div className="w-20 h-1 bg-gradient-to-r from-primary-500 to-accent-500 mx-auto" />
               <p className="text-gray-400">
                 Через инновации, синергию инженерии и искусства, через диалог с теми, кто готов мыслить смело. 
