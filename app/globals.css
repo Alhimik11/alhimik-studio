@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    --color-surface: 8 10 14;
-    --color-text: 244 248 255;
-    --color-muted: 140 155 176;
-    --color-cyan: 0 198 255;
-    --color-copper: 242 134 45;
+    --color-surface: 8 5 18;
+    --color-text: 246 239 255;
+    --color-muted: 169 150 196;
+    --color-cyan: 179 121 255;
+    --color-copper: 216 182 123;
   }
 
   *,
@@ -30,10 +30,10 @@
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
     background-color: rgb(var(--color-surface));
     background-image:
-      radial-gradient(circle at 0% 0%, rgba(0, 198, 255, 0.14), transparent 42%),
-      radial-gradient(circle at 100% 0%, rgba(242, 134, 45, 0.17), transparent 33%),
-      radial-gradient(circle at 50% 100%, rgba(0, 198, 255, 0.08), transparent 45%),
-      linear-gradient(180deg, #07080d 0%, #0c121b 100%);
+      radial-gradient(circle at 16% 8%, rgba(153, 94, 255, 0.3), transparent 44%),
+      radial-gradient(circle at 89% 9%, rgba(216, 182, 123, 0.14), transparent 36%),
+      radial-gradient(circle at 55% 95%, rgba(132, 67, 235, 0.17), transparent 38%),
+      linear-gradient(185deg, #06030f 0%, #090416 42%, #0f081e 100%);
   }
 
   a {
@@ -48,13 +48,14 @@
   }
 
   .glass-panel {
-    background: linear-gradient(
-      140deg,
-      rgba(255, 255, 255, 0.07),
-      rgba(255, 255, 255, 0.02)
-    );
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(12px);
+    background:
+      linear-gradient(140deg, rgba(140, 84, 246, 0.18), rgba(23, 14, 43, 0.58)),
+      linear-gradient(12deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(216, 182, 123, 0.22);
+    backdrop-filter: blur(16px);
+    box-shadow:
+      inset 0 0 0 1px rgba(196, 153, 255, 0.11),
+      0 20px 50px rgba(6, 3, 13, 0.5);
   }
 
   .grain-overlay {
@@ -66,10 +67,10 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.075) 0.5px, transparent 0.5px);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.08) 0.5px, transparent 0.5px);
     background-size: 3px 3px;
     mix-blend-mode: soft-light;
-    opacity: 0.4;
+    opacity: 0.3;
   }
 
   .neon-cyan {
@@ -81,10 +82,21 @@
   }
 
   .headline-gradient {
-    background: linear-gradient(120deg, #95f1ff 0%, #00c6ff 45%, #ffc88e 100%);
+    background: linear-gradient(120deg, #f1e0ff 0%, #be84ff 45%, #e5c784 100%);
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
+  }
+
+  .gold-outline-hover {
+    transition:
+      color 0.32s ease,
+      -webkit-text-stroke-color 0.32s ease;
+  }
+
+  .gold-outline-hover:hover {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(216, 182, 123, 0.92);
   }
 }
 
@@ -110,20 +122,48 @@ html.lenis {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0d14;
+  background: #100b1f;
 }
 
 ::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: linear-gradient(180deg, #00c6ff 0%, #f2862d 100%);
+  background: linear-gradient(180deg, #b379ff 0%, #d8b67b 100%);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #58e8ff 0%, #ffb15f 100%);
+  background: linear-gradient(180deg, #ca96ff 0%, #e4c78f 100%);
 }
 
 .custom-cursor {
   mix-blend-mode: difference;
+}
+
+html.magic-look body {
+  filter: grayscale(0.18) saturate(0.45) contrast(1.12);
+}
+
+html.magic-look body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(181, 125, 255, 0.13) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(181, 125, 255, 0.13) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mix-blend-mode: screen;
+  opacity: 0.35;
+  z-index: 90;
+}
+
+html.magic-look .glass-panel,
+html.magic-look section,
+html.magic-look article,
+html.magic-look nav,
+html.magic-look button {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: rgba(189, 150, 255, 0.52) !important;
 }
 
 @media (pointer: coarse) {

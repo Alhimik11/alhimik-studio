@@ -55,7 +55,7 @@ export default function RootLayout({
       <body className={`${sora.variable} ${unbounded.variable} ${spaceMono.variable} font-sans antialiased`}>
         <AppProviders>
           <Header />
-          <main className="min-h-screen overflow-x-clip">{children}</main>
+          <main className="min-h-screen overflow-x-clip pb-28">{children}</main>
           <Footer />
         </AppProviders>
       </body>
