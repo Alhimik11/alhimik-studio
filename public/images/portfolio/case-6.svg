@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#030910" />
+      <stop offset="55%" stop-color="#0d2136" />
+      <stop offset="100%" stop-color="#263a56" />
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="980" fill="url(#bg)" />
+  <path d="M100 200 L1300 200 L1120 820 L280 820 Z" fill="none" stroke="#63d8ff" stroke-width="4" stroke-opacity="0.35" />
+  <path d="M280 320 L1120 320" stroke="#ffc088" stroke-width="3" stroke-opacity="0.55" />
+  <text x="130" y="480" font-size="108" font-family="Arial, sans-serif" fill="#dbf5ff">XR MUSEUM</text>
+  <text x="130" y="560" font-size="40" font-family="Arial, sans-serif" fill="#9bc1dc">Immersive Exhibition Experience</text>
+</svg>

@@ -1,108 +1,133 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Menu, Volume2, VolumeX, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useAppStore } from "@/lib/store/useAppStore";
+import { useUISound } from "@/lib/sound/useUISound";
+
+const NAV_ITEMS = [
+  { href: "/", label: "Home" },
+  { href: "/services", label: "Services" },
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
 
 export function Header() {
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const soundEnabled = useAppStore((state) => state.soundEnabled);
+  const toggleSound = useAppStore((state) => state.toggleSound);
+  const setCursorType = useAppStore((state) => state.setCursorType);
+  const { playHover, playClick } = useUISound();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 18);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const navItems = [
-    { href: '/', label: 'Главная' },
-    { href: '/services', label: 'Услуги' },
-    { href: '/portfolio', label: 'Портфолио' },
-    { href: '/about', label: 'О нас' },
-    { href: '/contact', label: 'Контакты' },
-  ];
+  const handleInteractiveEnter = () => {
+    setCursorType("hover");
+    playHover();
+  };
+
+  const handleInteractiveLeave = () => {
+    setCursorType("default");
+  };
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-black/80 backdrop-blur-lg border-b border-white/10' : 'bg-transparent'
+      className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
+        isScrolled
+          ? "border-b border-cyan-300/20 bg-[#07101b]/70 backdrop-blur-xl"
+          : "bg-transparent"
       }`}
     >
-      <nav className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="relative w-12 h-12">
-              <Image
-                src="/logo.png"
-                alt="Alhimik Studio"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="text-xl font-display font-bold bg-gradient-to-r from-accent-500 to-primary-500 bg-clip-text text-transparent">
-              Alhimik Studio
-            </span>
-          </Link>
+      <nav className="mx-auto flex w-full max-w-[1320px] items-center justify-between px-4 py-4 md:px-7">
+        <Link
+          href="/"
+          className="flex items-center gap-3"
+          onMouseEnter={handleInteractiveEnter}
+          onMouseLeave={handleInteractiveLeave}
+        >
+          <div className="relative h-11 w-11 rounded-full border border-cyan-200/35 bg-white/5">
+            <Image src="/logo.png" alt="Alhimik Studio" fill className="object-contain p-1.5" priority />
+          </div>
+          <div className="leading-tight">
+            <p className="font-display text-sm uppercase tracking-[0.2em] text-cyan-200">Alhimik</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-mutedext">Immersive Lab</p>
+          </div>
+        </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
+        <div className="hidden items-center gap-8 lg:flex">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onMouseEnter={handleInteractiveEnter}
+              onMouseLeave={handleInteractiveLeave}
+              className={`relative text-sm uppercase tracking-[0.2em] transition-colors ${
+                pathname === item.href ? "text-cyan-300" : "text-mutedext hover:text-white"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              toggleSound();
+              playClick();
+            }}
+            onMouseEnter={handleInteractiveEnter}
+            onMouseLeave={handleInteractiveLeave}
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:border-cyan-300/45 hover:bg-cyan-400/10"
+            aria-label={soundEnabled ? "Disable sound" : "Enable sound"}
+          >
+            {soundEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((state) => !state)}
+            onMouseEnter={handleInteractiveEnter}
+            onMouseLeave={handleInteractiveLeave}
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/5 lg:hidden"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMenuOpen ? <X size={19} /> : <Menu size={19} />}
+          </button>
+        </div>
+      </nav>
+
+      {isMenuOpen && (
+        <div className="border-t border-white/10 bg-[#060b12]/95 px-4 pb-6 pt-4 backdrop-blur-xl lg:hidden">
+          <div className="mx-auto grid max-w-[1320px] gap-2">
+            {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-300 hover:text-accent-400 transition-colors relative group"
+                onClick={() => setIsMenuOpen(false)}
+                className={`rounded-xl px-4 py-3 text-sm uppercase tracking-[0.17em] ${
+                  pathname === item.href
+                    ? "bg-cyan-400/15 text-cyan-200"
+                    : "bg-white/5 text-white/85"
+                }`}
               >
                 {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-accent-500 to-primary-500 transition-all group-hover:w-full" />
               </Link>
             ))}
-            <Link
-              href="/contact"
-              className="px-6 py-2 bg-gradient-to-r from-primary-600 to-accent-600 rounded-full text-white font-medium hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-            >
-              Связаться
-            </Link>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4">
-            <div className="flex flex-col space-y-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-gray-300 hover:text-accent-400 transition-colors py-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Link
-                href="/contact"
-                className="px-6 py-2 bg-gradient-to-r from-primary-600 to-accent-600 rounded-full text-white font-medium text-center"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Связаться
-              </Link>
-            </div>
-          </div>
-        )}
-      </nav>
+      )}
     </header>
   );
 }

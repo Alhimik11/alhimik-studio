@@ -1,112 +1,115 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { ArrowRight, Play } from 'lucide-react';
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Sparkles } from "lucide-react";
+import { TextReveal } from "@/components/ui/TextReveal";
+import { useAppStore } from "@/lib/store/useAppStore";
+import { useUISound } from "@/lib/sound/useUISound";
+
+const HeroCanvas = dynamic(
+  () => import("@/components/hero/HeroCanvas").then((module) => module.HeroCanvas),
+  {
+    ssr: false,
+    loading: () => <div className="absolute inset-0 bg-gradient-to-br from-[#04070f] to-[#0e1926]" />,
+  },
+);
 
 export function Hero() {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const setCursorType = useAppStore((state) => state.setCursorType);
+  const { playHover, playClick } = useUISound();
+
+  useEffect(() => {
+    if (!sectionRef.current) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.16 },
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Video Background */}
-      <div className="absolute inset-0 z-0">
-        {/* Video element */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          poster="/hero-poster.jpg"
-        >
-          <source src="/hero-video.mp4" type="video/mp4" />
-          <source src="/hero-video.webm" type="video/webm" />
-          {/* Fallback gradient if video doesn't load */}
-        </video>
-        
-        {/* Fallback gradient (shown if video not loaded) */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-purple-900/20 to-black">
-          <div className="absolute inset-0 opacity-30"
-               style={{
-                 backgroundImage: `radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-                                  radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 50%)`
-               }}
-          />
-        </div>
-        
-        {/* Video overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/60" />
+    <section ref={sectionRef} className="relative min-h-screen overflow-hidden pt-24 sm:pt-28">
+      <div className="absolute inset-0">
+        <HeroCanvas active={isVisible} />
       </div>
 
-      {/* Content */}
-      <div className="relative z-20 container mx-auto px-4 text-center">
-        <div className="max-w-5xl mx-auto space-y-8">
-          {/* Badge */}
-          <div className="inline-flex items-center space-x-2 px-4 py-2 glass rounded-full border border-accent-500/30">
-            <div className="w-2 h-2 bg-accent-500 rounded-full animate-pulse" />
-            <span className="text-sm text-gray-200">AI • Видео • Метавселенные</span>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,198,255,0.17),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(242,134,45,0.19),transparent_38%)]" />
+
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-6rem)] w-full max-w-[1320px] items-center px-4 pb-16 md:px-7">
+        <div className="max-w-[780px] space-y-8">
+          <div className="inline-flex items-center gap-3 rounded-full border border-cyan-200/30 bg-white/5 px-5 py-2 text-xs uppercase tracking-[0.26em] text-cyan-200">
+            <Sparkles size={14} />
+            AI · VR · AR · WEBGL
           </div>
 
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-tight">
-            <span className="block">Видеопродакшн будущего</span>
-            <span className="block mt-2">
-              <span className="bg-gradient-to-r from-primary-400 via-accent-400 to-primary-400 bg-clip-text text-transparent">
-                и иммерсивные технологии
-              </span>
-            </span>
-          </h1>
+          <div className="space-y-4">
+            <TextReveal
+              as="h1"
+              text="Immersive Products for Future-ready Brands"
+              className="text-balance font-display text-[2.1rem] font-semibold uppercase leading-[0.98] sm:text-[2.8rem] md:text-[3.8rem] lg:text-[4.65rem]"
+              step={0.015}
+            />
+            <p className="max-w-[620px] text-base text-slate-200/90 sm:text-lg md:text-xl">
+              We design cinematic digital scenes with realtime shaders, AR-ready product showcases, and interactive
+              AI storytelling that performs at production scale.
+            </p>
+          </div>
 
-          {/* Description */}
-          <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Создаем рекламные AI-ролики, VR-тренажеры и 3D-графику для бизнеса.<br />
-            От идеи до релиза за 2 недели.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+          <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/portfolio"
-              className="group px-8 py-4 bg-gradient-to-r from-primary-600 to-accent-600 rounded-full text-white font-semibold text-lg flex items-center space-x-3 hover:shadow-2xl hover:shadow-purple-500/50 transition-all hover:scale-105"
+              className="pointer-events-auto inline-flex items-center gap-3 rounded-full border border-cyan-200/30 bg-cyan-400/15 px-7 py-3 text-sm uppercase tracking-[0.2em] text-cyan-100 transition-all hover:bg-cyan-400/30"
+              onMouseEnter={() => {
+                setCursorType("view");
+                playHover();
+              }}
+              onMouseLeave={() => setCursorType("default")}
+              onClick={playClick}
             >
-              <Play className="w-6 h-6 fill-white" />
-              <span>Смотреть шоурил</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Explore Showcase
+              <ArrowUpRight size={16} />
             </Link>
             <Link
               href="/contact"
-              className="group px-8 py-4 border-2 border-accent-500/50 rounded-full text-white font-semibold text-lg hover:bg-accent-500/10 transition-all backdrop-blur-sm"
+              className="pointer-events-auto rounded-full border border-copper-300/45 bg-copper-400/10 px-7 py-3 text-sm uppercase tracking-[0.2em] text-copper-100 transition-all hover:bg-copper-400/22"
+              onMouseEnter={() => {
+                setCursorType("hover");
+                playHover();
+              }}
+              onMouseLeave={() => setCursorType("default")}
+              onClick={playClick}
             >
-              Начать проект
+              Start a Project
             </Link>
           </div>
 
-          {/* Trust Indicators */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-16 max-w-4xl mx-auto">
+          <div className="grid max-w-[620px] grid-cols-2 gap-4 pt-2 sm:grid-cols-4">
             {[
-              { value: '50+', label: 'Проектов' },
-              { value: '30+', label: 'Клиентов' },
-              { value: '5+', label: 'Лет опыта' },
-              { value: 'R&D', label: 'Собственный' },
-            ].map((stat) => (
-              <div key={stat.label} className="group">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative glass-subtle rounded-2xl p-6 border border-white/5 hover:border-accent-500/30 transition-colors">
-                    <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent-400 to-primary-400 bg-clip-text text-transparent">
-                      {stat.value}
-                    </div>
-                    <div className="text-gray-400 mt-2 text-sm">{stat.label}</div>
-                  </div>
-                </div>
+              { metric: "90+", title: "Lighthouse target" },
+              { metric: "60FPS", title: "Realtime baseline" },
+              { metric: "3D + AR", title: "Production ready" },
+              { metric: "PWA", title: "Installable shell" },
+            ].map((item) => (
+              <div key={item.title} className="glass-panel rounded-2xl p-4">
+                <p className="font-display text-lg uppercase text-cyan-200">{item.metric}</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-mutedext">{item.title}</p>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-3 bg-white/50 rounded-full" />
         </div>
       </div>
     </section>

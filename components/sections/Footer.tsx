@@ -1,104 +1,41 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import Link from "next/link";
+
+const LINKS = [
+  { href: "/services", label: "Services" },
+  { href: "/portfolio", label: "Portfolio" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-black border-t border-white/10">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* About */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="relative w-10 h-10">
-                <Image
-                  src="/logo.png"
-                  alt="Alhimik Studio"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <span className="text-xl font-display font-bold bg-gradient-to-r from-accent-500 to-primary-500 bg-clip-text text-transparent">
-                Alhimik Studio
-              </span>
-            </div>
-            <p className="text-gray-400 text-sm">
-              Создаем будущее с помощью VR/AR/MR, 3D-визуализации и BIM-технологий.
+    <footer className="relative border-t border-white/10 bg-[#05080f]">
+      <div className="pointer-events-none absolute inset-0 bg-aurora opacity-40" />
+      <div className="relative mx-auto flex w-full max-w-[1320px] flex-col gap-8 px-4 py-12 md:px-7">
+        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+          <div>
+            <p className="font-display text-2xl uppercase tracking-[0.16em] text-cyan-200">Alhimik Studio</p>
+            <p className="mt-2 max-w-xl text-sm text-mutedext">
+              Immersive interfaces, realtime 3D storytelling, VR/AR experiences, and AI-powered product showcases.
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Быстрые ссылки</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/services" className="text-gray-400 hover:text-white transition-colors">
-                  Услуги
-                </Link>
-              </li>
-              <li>
-                <Link href="/portfolio" className="text-gray-400 hover:text-white transition-colors">
-                  Портфолио
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
-                  О нас
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
-                  Контакты
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Услуги</h3>
-            <ul className="space-y-2">
-              <li className="text-gray-400">VR/AR/MR приложения</li>
-              <li className="text-gray-400">3D Видео и анимация</li>
-              <li className="text-gray-400">Архитектурная визуализация</li>
-              <li className="text-gray-400">BIM-проектирование</li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Контакты</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start space-x-3">
-                <Mail className="w-5 h-5 text-primary-500 mt-0.5" />
-                <a href="mailto:info@alhimik-studio.ru" className="text-gray-400 hover:text-white transition-colors text-sm">
-                  info@alhimik-studio.ru
-                </a>
-              </li>
-              <li className="flex items-start space-x-3">
-                <Phone className="w-5 h-5 text-primary-500 mt-0.5" />
-                <a href="tel:+79999999999" className="text-gray-400 hover:text-white transition-colors text-sm">
-                  +7 (999) 999-99-99
-                </a>
-              </li>
-              <li className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-primary-500 mt-0.5" />
-                <span className="text-gray-400 text-sm">
-                  Россия
-                </span>
-              </li>
-            </ul>
+          <div className="flex flex-wrap gap-5 text-xs uppercase tracking-[0.25em] text-mutedext">
+            {LINKS.map((item) => (
+              <Link key={item.href} href={item.href} className="transition-colors hover:text-cyan-300">
+                {item.label}
+              </Link>
+            ))}
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-8 pt-8 text-center">
-          <p className="text-gray-400 text-sm">
-            © {currentYear} Alhimik Studio. Все права защищены.
-          </p>
+        <div className="flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-xs uppercase tracking-[0.18em] text-mutedext sm:flex-row sm:items-center">
+          <p>© {year} Alhimik Studio</p>
+          <p>Built for VR · AR · AI</p>
         </div>
       </div>
     </footer>

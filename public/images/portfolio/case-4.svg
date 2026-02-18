@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#050a0a" />
+      <stop offset="60%" stop-color="#123736" />
+      <stop offset="100%" stop-color="#1f5746" />
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="980" fill="url(#bg)" />
+  <path d="M80 760 C280 520 460 840 690 610 C860 430 1050 460 1320 210" stroke="#8fffd1" stroke-width="10" fill="none" stroke-opacity="0.5" />
+  <text x="115" y="445" font-size="112" font-family="Arial, sans-serif" fill="#d9fff0">BIM TWIN</text>
+  <text x="115" y="532" font-size="42" font-family="Arial, sans-serif" fill="#baf7de">Data-driven Building Model</text>
+</svg>

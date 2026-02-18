@@ -1,30 +1,47 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Sora, Space_Mono, Unbounded } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
+import { AppProviders } from "@/components/providers/AppProviders";
 
-const inter = Inter({ 
-  subsets: ["latin", "cyrillic"],
-  variable: '--font-inter',
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-sora",
 });
 
-const spaceGrotesk = Space_Grotesk({ 
+const unbounded = Unbounded({
   subsets: ["latin"],
-  variable: '--font-space-grotesk',
+  variable: "--font-unbounded",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
 });
 
 export const metadata: Metadata = {
-  title: "Alhimik Studio | VR/AR/MR, 3D Визуализация, BIM",
-  description: "Создаем будущее с помощью виртуальной реальности, 3D-визуализации и BIM-технологий. VR/AR/MR приложения, архитектурная визуализация, 3D-анимация.",
-  keywords: ["VR", "AR", "MR", "3D визуализация", "архитектурная визуализация", "BIM", "3D анимация", "виртуальная реальность"],
-  authors: [{ name: "Alhimik Studio" }],
+  metadataBase: new URL("https://alhimik-studio.ru"),
+  title: {
+    default: "Alhimik Studio | Immersive VR, AR, AI Experiences",
+    template: "%s | Alhimik Studio",
+  },
+  description:
+    "Creative development studio building cinematic web experiences, realtime 3D products, VR/AR interactions, and AI-driven visuals.",
+  keywords: ["VR", "AR", "WebGL", "Three.js", "Realtime 3D", "AI video", "Immersive web"],
+  manifest: "/manifest.webmanifest",
   openGraph: {
-    title: "Alhimik Studio | Визуализируем будущее",
-    description: "VR/AR/MR разработка, 3D-визуализация, архитектурная визуализация, BIM-проектирование",
-    type: "website",
-    locale: "ru_RU",
+    title: "Alhimik Studio",
+    description:
+      "Immersive web experiences powered by realtime 3D, AR, VR, and AI visuals.",
+    url: "https://alhimik-studio.ru",
     siteName: "Alhimik Studio",
+    locale: "ru_RU",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/",
   },
 };
 
@@ -34,13 +51,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className="dark">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased bg-black text-white`}>
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+    <html lang="ru" suppressHydrationWarning>
+      <body className={`${sora.variable} ${unbounded.variable} ${spaceMono.variable} font-sans antialiased`}>
+        <AppProviders>
+          <Header />
+          <main className="min-h-screen overflow-x-clip">{children}</main>
+          <Footer />
+        </AppProviders>
       </body>
     </html>
   );

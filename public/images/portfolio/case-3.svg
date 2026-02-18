@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#05090f" />
+      <stop offset="50%" stop-color="#10182c" />
+      <stop offset="100%" stop-color="#1b314f" />
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="980" fill="url(#bg)" />
+  <rect x="80" y="80" width="1240" height="820" stroke="#7ddaf8" stroke-opacity="0.25" stroke-width="2" fill="none" />
+  <circle cx="1080" cy="260" r="190" fill="#00c6ff" fill-opacity="0.18" />
+  <text x="130" y="455" font-size="112" font-family="Arial, sans-serif" fill="#d8f7ff">AI SPOT</text>
+  <text x="130" y="540" font-size="40" font-family="Arial, sans-serif" fill="#9ed0ee">Neural Campaign Engine</text>
+</svg>
