@@ -22,34 +22,34 @@ const ServicePreviewCanvas = dynamic(
 const SERVICES = [
   {
     id: "01",
-    title: "VR Training Environments",
-    short: "Operational simulations and onboarding labs.",
+    title: "VR-тренажеры и среды",
+    short: "Операционные симуляции и практические лаборатории для команд.",
     details:
-      "Realtime digital twins for workforce training with analytics and adaptive training paths.",
+      "Сцены цифрового двойника в реальном времени для обучения сотрудников с аналитикой и адаптивными траекториями.",
     variant: "vr" as const,
   },
   {
     id: "02",
-    title: "AR Product Experience",
-    short: "Try-in-place experiences for mobile commerce.",
+    title: "AR-опыт продукта",
+    short: "Просмотр и примерка товара в реальном пространстве пользователя.",
     details:
-      "WebXR and native AR scenes that bring products into customer spaces before purchase.",
+      "WebXR и нативные AR-сцены, которые помогают клиентам оценить продукт еще до покупки.",
     variant: "ar" as const,
   },
   {
     id: "03",
-    title: "AI Campaign Production",
-    short: "Generative visual pipelines and motion systems.",
+    title: "AI-продакшн кампаний",
+    short: "Генеративные пайплайны для визуалов, роликов и контент-серий.",
     details:
-      "AI-assisted scripts, visual concepts, and post-produced campaign assets for rapid launch cycles.",
+      "AI-ассистированная разработка сценариев, концептов и финальных материалов с быстрым циклом релиза.",
     variant: "ai" as const,
   },
   {
     id: "04",
-    title: "BIM and Spatial Data",
-    short: "High-fidelity building intelligence workflows.",
+    title: "BIM и пространственные данные",
+    short: "Точные цифровые модели зданий и процессы координации.",
     details:
-      "Model coordination, clash detection, and visualization systems connected to project operations.",
+      "Координация моделей, поиск коллизий и визуализация, связанная с задачами эксплуатации и стройки.",
     variant: "bim" as const,
   },
 ];
@@ -92,13 +92,13 @@ export function Services() {
       <div className="mx-auto grid w-full max-w-[1320px] gap-10 lg:grid-cols-[1.2fr_1fr]">
         <div className="space-y-6">
           <TextReveal
-            text="Services as Interactive Scenes"
+            text="Услуги как интерактивные сцены"
             className="font-display text-3xl uppercase leading-tight sm:text-4xl md:text-5xl"
             step={0.02}
           />
           <p className="max-w-xl text-mutedext">
-            Each service is treated as a playable scene, not static copy. Hover a service to preview a linked 3D
-            interaction and inspect key outcomes.
+            Каждая услуга подается как игровая сцена, а не статичный текст. Наведите курсор на пункт, чтобы увидеть
+            3D-превью и ключевые результаты.
           </p>
 
           <div className="grid gap-3">
@@ -154,11 +154,11 @@ export function Services() {
             <ServicePreviewCanvas variant={activeService.variant} />
           </div>
           <div className="space-y-3 p-6">
-            <p className="font-mono text-xs uppercase tracking-[0.24em] text-cyan-200">LIVE PREVIEW</p>
+            <p className="font-mono text-xs uppercase tracking-[0.24em] text-cyan-200">ЖИВОЕ ПРЕВЬЮ</p>
             <h3 className="font-display text-2xl uppercase">{activeService.title}</h3>
             <p className="text-sm text-mutedext">{activeService.details}</p>
             <p className="text-[11px] uppercase tracking-[0.18em] text-copper-300">
-              Replace preview with alpha WebM or product model when assets are ready.
+              Можно заменить превью на alpha WebM или GLB-модель, когда будут готовы ассеты.
             </p>
           </div>
         </div>

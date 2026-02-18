@@ -13,12 +13,12 @@ export function CTA() {
           <div className="relative z-10 grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-end">
             <div className="space-y-4">
               <TextReveal
-                text="Have a Product Idea that Needs Immersion?"
+                text="Есть идея продукта, которому нужна иммерсивность?"
                 className="font-display text-3xl uppercase leading-tight sm:text-4xl md:text-5xl"
               />
               <p className="max-w-2xl text-sm text-slate-100/85 sm:text-base">
-                We can turn your concept into an interactive scene-driven product with realtime 3D, cinematic motion,
-                and measurable business outcomes.
+                Мы превратим концепт в интерактивный продукт со сценовой архитектурой, 3D в реальном времени, кинематографичной
+                анимацией и измеримым бизнес-результатом.
               </p>
             </div>
 
@@ -27,7 +27,7 @@ export function CTA() {
                 href="/contact"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-cyan-200/35 bg-cyan-400/20 px-6 py-4 text-sm uppercase tracking-[0.2em] text-cyan-100 transition-colors hover:bg-cyan-400/32"
               >
-                Start Discovery
+                Начать обсуждение
                 <ArrowUpRight size={16} />
               </Link>
               <a

@@ -7,12 +7,12 @@ import { useAppStore } from "@/lib/store/useAppStore";
 import { useUISound } from "@/lib/sound/useUISound";
 
 const PHRASES = [
-  "Loading reality",
-  "Initializing neural networks",
-  "Calibrating spatial matrix",
-  "Forging liquid chrome",
-  "Syncing immersive scene",
-  "Rendering alchemy",
+  "Загрузка реальности",
+  "Инициализация нейросетей",
+  "Калибровка пространственной матрицы",
+  "Формирование жидкого хрома",
+  "Синхронизация иммерсивной сцены",
+  "Рендер алхимии",
 ];
 
 export function Preloader() {
@@ -79,18 +79,18 @@ export function Preloader() {
       ref={overlayRef}
       className="fixed inset-0 z-[100] grid place-items-center bg-[#06090f] text-white"
       aria-live="polite"
-      aria-label="Preloader"
+      aria-label="Прелоадер"
     >
       <div className="w-[min(92vw,680px)] space-y-8 px-4">
         <p className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-300">
-          System Boot Sequence
+          Системная загрузка
         </p>
 
         <div className="space-y-2">
           <p className="text-3xl font-display uppercase tracking-tight text-balance sm:text-5xl">
             {phrase}
           </p>
-          <p className="text-sm text-mutedext/90">WebGL assets and shaders are loading.</p>
+          <p className="text-sm text-mutedext/90">Загружаются WebGL-ассеты и шейдеры.</p>
         </div>
 
         <div className="h-[2px] overflow-hidden bg-white/15">
@@ -101,7 +101,7 @@ export function Preloader() {
         </div>
 
         <div className="flex items-center justify-between text-xs tracking-[0.24em] text-mutedext">
-          <span>NEURAL CORE</span>
+          <span>НЕЙРО-ЯДРО</span>
           <span>{Math.round(progress)}%</span>
         </div>
       </div>

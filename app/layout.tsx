@@ -24,17 +24,17 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://alhimik-studio.ru"),
   title: {
-    default: "Alhimik Studio | Immersive VR, AR, AI Experiences",
+    default: "Alhimik Studio | Иммерсивные VR, AR и AI-проекты",
     template: "%s | Alhimik Studio",
   },
   description:
-    "Creative development studio building cinematic web experiences, realtime 3D products, VR/AR interactions, and AI-driven visuals.",
-  keywords: ["VR", "AR", "WebGL", "Three.js", "Realtime 3D", "AI video", "Immersive web"],
+    "Креативная студия разработки: кинематографичные веб-сцены, 3D в реальном времени, VR/AR-интерактив и AI-визуализации.",
+  keywords: ["VR", "AR", "WebGL", "Three.js", "3D в реальном времени", "AI-видео", "Иммерсивный веб"],
   manifest: "/manifest.webmanifest",
   openGraph: {
     title: "Alhimik Studio",
     description:
-      "Immersive web experiences powered by realtime 3D, AR, VR, and AI visuals.",
+      "Иммерсивные веб-решения на базе 3D в реальном времени, AR, VR и AI-визуалов.",
     url: "https://alhimik-studio.ru",
     siteName: "Alhimik Studio",
     locale: "ru_RU",

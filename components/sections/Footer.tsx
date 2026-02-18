@@ -3,10 +3,10 @@
 import Link from "next/link";
 
 const LINKS = [
-  { href: "/services", label: "Services" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/services", label: "Услуги" },
+  { href: "/portfolio", label: "Портфолио" },
+  { href: "/about", label: "О нас" },
+  { href: "/contact", label: "Контакты" },
 ];
 
 export function Footer() {
@@ -20,7 +20,7 @@ export function Footer() {
           <div>
             <p className="font-display text-2xl uppercase tracking-[0.16em] text-cyan-200">Alhimik Studio</p>
             <p className="mt-2 max-w-xl text-sm text-mutedext">
-              Immersive interfaces, realtime 3D storytelling, VR/AR experiences, and AI-powered product showcases.
+              Иммерсивные интерфейсы, 3D-сторителлинг в реальном времени, VR/AR-опыт и AI-визуализации для продуктов и брендов.
             </p>
           </div>
 
@@ -35,7 +35,7 @@ export function Footer() {
 
         <div className="flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-6 text-xs uppercase tracking-[0.18em] text-mutedext sm:flex-row sm:items-center">
           <p>© {year} Alhimik Studio</p>
-          <p>Built for VR · AR · AI</p>
+          <p>Создано для VR · AR · AI</p>
         </div>
       </div>
     </footer>

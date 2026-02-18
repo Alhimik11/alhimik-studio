@@ -59,13 +59,13 @@ export function Hero() {
           <div className="space-y-4">
             <TextReveal
               as="h1"
-              text="Immersive Products for Future-ready Brands"
+              text="Иммерсивные продукты для брендов будущего"
               className="text-balance font-display text-[2.1rem] font-semibold uppercase leading-[0.98] sm:text-[2.8rem] md:text-[3.8rem] lg:text-[4.65rem]"
               step={0.015}
             />
             <p className="max-w-[620px] text-base text-slate-200/90 sm:text-lg md:text-xl">
-              We design cinematic digital scenes with realtime shaders, AR-ready product showcases, and interactive
-              AI storytelling that performs at production scale.
+              Мы проектируем кинематографичные цифровые сцены с realtime-шейдерами, AR-презентациями продуктов и
+              интерактивным AI-сторителлингом, который работает на продакшн-уровне.
             </p>
           </div>
 
@@ -80,7 +80,7 @@ export function Hero() {
               onMouseLeave={() => setCursorType("default")}
               onClick={playClick}
             >
-              Explore Showcase
+              Смотреть кейсы
               <ArrowUpRight size={16} />
             </Link>
             <Link
@@ -93,16 +93,16 @@ export function Hero() {
               onMouseLeave={() => setCursorType("default")}
               onClick={playClick}
             >
-              Start a Project
+              Запустить проект
             </Link>
           </div>
 
           <div className="grid max-w-[620px] grid-cols-2 gap-4 pt-2 sm:grid-cols-4">
             {[
-              { metric: "90+", title: "Lighthouse target" },
-              { metric: "60FPS", title: "Realtime baseline" },
-              { metric: "3D + AR", title: "Production ready" },
-              { metric: "PWA", title: "Installable shell" },
+              { metric: "90+", title: "Цель Lighthouse" },
+              { metric: "60FPS", title: "Базовые 60 FPS" },
+              { metric: "3D + AR", title: "Готово к продакшену" },
+              { metric: "PWA", title: "Устанавливаемая оболочка" },
             ].map((item) => (
               <div key={item.title} className="glass-panel rounded-2xl p-4">
                 <p className="font-display text-lg uppercase text-cyan-200">{item.metric}</p>

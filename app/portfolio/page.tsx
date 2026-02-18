@@ -3,8 +3,8 @@ import { Portfolio } from "@/components/sections/Portfolio";
 import { CTA } from "@/components/sections/CTA";
 
 export const metadata: Metadata = {
-  title: "Portfolio",
-  description: "Interactive showcase of immersive cases and realtime experiments.",
+  title: "Портфолио",
+  description: "Интерактивный шоукейс иммерсивных кейсов и экспериментов в реальном времени от Alhimik Studio.",
 };
 
 export default function PortfolioPage() {

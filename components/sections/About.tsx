@@ -6,23 +6,23 @@ import { TextReveal } from "@/components/ui/TextReveal";
 const VALUES = [
   {
     icon: FlaskConical,
-    title: "Scene-first Engineering",
-    description: "We build every page as a directed scene with behavior, lighting, and interaction logic.",
+    title: "Сценарная инженерия",
+    description: "Каждую страницу мы строим как сцену с логикой поведения, светом и интерактивностью.",
   },
   {
     icon: Radar,
-    title: "Realtime Performance",
-    description: "Design direction is paired with strict performance budgets for smooth 60 FPS interactions.",
+    title: "Производительность в реальном времени",
+    description: "Дизайн сразу проектируется под строгие бюджеты производительности и стабильные 60 FPS.",
   },
   {
     icon: Orbit,
-    title: "Spatial Thinking",
-    description: "Products are modeled in space first, then translated into browser and mobile experiences.",
+    title: "Пространственное мышление",
+    description: "Продукт моделируется в пространстве, а затем переносится в веб и мобильные интерфейсы.",
   },
   {
     icon: Sparkles,
-    title: "AI Production Pipelines",
-    description: "Generative tooling accelerates concepting and content generation without losing authorship.",
+    title: "AI-пайплайны продакшна",
+    description: "Генеративные инструменты ускоряют разработку контента без потери авторского контроля.",
   },
 ];
 
@@ -32,19 +32,19 @@ export function About() {
       <div className="mx-auto grid w-full max-w-[1320px] gap-8 lg:grid-cols-[1.1fr_1fr]">
         <div className="space-y-6">
           <TextReveal
-            text="Built by a Team that Ships Immersive Products"
+            text="Команда, которая выпускает иммерсивные продукты"
             className="font-display text-3xl uppercase leading-tight sm:text-4xl md:text-5xl"
           />
           <p className="max-w-xl text-mutedext">
-            Alhimik Studio merges creative direction with deep engineering. We ship products where WebGL, animation
-            systems, and content architecture work as one pipeline.
+            Alhimik Studio объединяет креативное направление и инженерную глубину. Мы выпускаем продукты, где WebGL,
+            анимация и архитектура контента работают как единая система.
           </p>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { value: "50+", label: "Delivered cases" },
-              { value: "5y", label: "Production practice" },
-              { value: "R3F", label: "Core rendering stack" },
-              { value: "PWA", label: "Installable products" },
+              { value: "50+", label: "Реализованных кейсов" },
+              { value: "5 лет", label: "Практики в продакшне" },
+              { value: "R3F", label: "Базовый рендер-стек" },
+              { value: "PWA", label: "Устанавливаемые продукты" },
             ].map((item) => (
               <div key={item.label} className="glass-panel rounded-2xl p-4">
                 <p className="font-display text-2xl uppercase text-cyan-200">{item.value}</p>

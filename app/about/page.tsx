@@ -3,8 +3,8 @@ import { About } from "@/components/sections/About";
 import { CTA } from "@/components/sections/CTA";
 
 export const metadata: Metadata = {
-  title: "About",
-  description: "Alhimik Studio team, values, and immersive engineering process.",
+  title: "О нас",
+  description: "Команда Alhimik Studio, ценности и процесс разработки иммерсивных проектов.",
 };
 
 export default function AboutPage() {

@@ -3,8 +3,8 @@ import { Services } from "@/components/sections/Services";
 import { CTA } from "@/components/sections/CTA";
 
 export const metadata: Metadata = {
-  title: "Services",
-  description: "VR, AR, AI, BIM and realtime 3D services by Alhimik Studio.",
+  title: "Услуги",
+  description: "Услуги Alhimik Studio: VR, AR, AI, BIM и 3D-разработка в реальном времени.",
 };
 
 export default function ServicesPage() {

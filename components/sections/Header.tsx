@@ -9,11 +9,11 @@ import { useAppStore } from "@/lib/store/useAppStore";
 import { useUISound } from "@/lib/sound/useUISound";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/", label: "Главная" },
+  { href: "/services", label: "Услуги" },
+  { href: "/portfolio", label: "Портфолио" },
+  { href: "/about", label: "О нас" },
+  { href: "/contact", label: "Контакты" },
 ];
 
 export function Header() {
@@ -60,7 +60,7 @@ export function Header() {
           </div>
           <div className="leading-tight">
             <p className="font-display text-sm uppercase tracking-[0.2em] text-cyan-200">Alhimik</p>
-            <p className="text-xs uppercase tracking-[0.3em] text-mutedext">Immersive Lab</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-mutedext">Цифровая студия</p>
           </div>
         </Link>
 
@@ -90,7 +90,7 @@ export function Header() {
             onMouseEnter={handleInteractiveEnter}
             onMouseLeave={handleInteractiveLeave}
             className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:border-cyan-300/45 hover:bg-cyan-400/10"
-            aria-label={soundEnabled ? "Disable sound" : "Enable sound"}
+            aria-label={soundEnabled ? "Отключить звук" : "Включить звук"}
           >
             {soundEnabled ? <Volume2 size={17} /> : <VolumeX size={17} />}
           </button>
@@ -101,7 +101,7 @@ export function Header() {
             onMouseEnter={handleInteractiveEnter}
             onMouseLeave={handleInteractiveLeave}
             className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/5 lg:hidden"
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
           >
             {isMenuOpen ? <X size={19} /> : <Menu size={19} />}
           </button>

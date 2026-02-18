@@ -34,54 +34,54 @@ type Project = {
 const PROJECTS: Project[] = [
   {
     id: 1,
-    title: "VR Plant Safety Trainer",
-    category: "VR / Training",
-    summary: "Scenario-based safety protocols for manufacturing teams with live scoring.",
+    title: "VR-тренажер промышленной безопасности",
+    category: "VR / Обучение",
+    summary: "Сценарное обучение персонала с системой оценки действий в реальном времени.",
     imageUrl: "/images/portfolio/case-1.svg",
     modelUrl: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
-    tags: ["Unity", "Realtime Physics", "LMS"],
+    tags: ["Unity", "Физика", "LMS"],
   },
   {
     id: 2,
-    title: "AR Commerce Configurator",
-    category: "AR / Retail",
-    summary: "Mobile product placement and variant testing for furniture collections.",
+    title: "AR-конфигуратор для e-commerce",
+    category: "AR / Ритейл",
+    summary: "Размещение и примерка товаров в пространстве клиента с выбором вариантов.",
     imageUrl: "/images/portfolio/case-2.svg",
     modelUrl: "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb",
     tags: ["WebXR", "USDZ", "iOS/Android"],
   },
   {
     id: 3,
-    title: "Neural Ad Engine",
-    category: "AI / Video",
-    summary: "Generative concept frames and ad cuts connected to campaign dashboards.",
+    title: "AI-движок рекламных материалов",
+    category: "AI / Видео",
+    summary: "Генерация концептов, кадров и роликов, связанных с маркетинговой аналитикой.",
     imageUrl: "/images/portfolio/case-3.svg",
-    tags: ["ComfyUI", "After Effects", "Prompt Pipeline"],
+    tags: ["ComfyUI", "After Effects", "Промпт-пайплайн"],
   },
   {
     id: 4,
-    title: "BIM Digital Twin Hub",
-    category: "BIM / Data",
-    summary: "Connected BIM model ecosystem for operations, clash detection, and reporting.",
+    title: "BIM-платформа цифрового двойника",
+    category: "BIM / Данные",
+    summary: "Единая BIM-экосистема для координации, проверок коллизий и отчетности.",
     imageUrl: "/images/portfolio/case-4.svg",
     tags: ["Revit", "IFC", "Navisworks"],
   },
   {
     id: 5,
-    title: "Interactive Product Showroom",
-    category: "WebGL / Showcase",
-    summary: "Narrative product launch site with realtime material and camera systems.",
+    title: "Интерактивный цифровой шоурум",
+    category: "WebGL / Витрина",
+    summary: "Промо-сайт продукта с управляемыми материалами и кинематографичной камерой.",
     imageUrl: "/images/portfolio/case-5.svg",
     tags: ["Three.js", "GSAP", "R3F"],
   },
   {
     id: 6,
-    title: "XR Museum Installation",
-    category: "XR / Cultural",
-    summary: "Immersive exhibition flows blending AR, touch interactions, and storytelling.",
+    title: "XR-инсталляция для музея",
+    category: "XR / Культура",
+    summary: "Иммерсивный сценарий выставки с AR-слоями, сенсорным интерактивом и звуком.",
     imageUrl: "/images/portfolio/case-6.svg",
     modelUrl: "https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb",
-    tags: ["Spatial Audio", "WebGL", "Projection"],
+    tags: ["Пространственный звук", "WebGL", "Проекционный контент"],
   },
 ];
 
@@ -121,12 +121,12 @@ export function Portfolio() {
       <div className="mx-auto w-full max-w-[1320px] space-y-10">
         <div className="space-y-5">
           <TextReveal
-            text="Portfolio as Playable Narrative"
+            text="Портфолио как интерактивный нарратив"
             className="font-display text-3xl uppercase leading-tight sm:text-4xl md:text-5xl"
           />
           <p className="max-w-2xl text-mutedext">
-            Hover previews run through shader-based displacement mapping. Click any case to expand it into a full-screen
-            scene transition without page reload.
+            Превью по наведению работает через шейдерное искажение. Нажмите на кейс, чтобы раскрыть его в полноэкранный
+            переход без перезагрузки страницы.
           </p>
         </div>
 
@@ -227,7 +227,7 @@ export function Portfolio() {
                         setShowAR(false);
                       }}
                     >
-                      Close Case
+                      Закрыть кейс
                     </button>
 
                     {isMobileDevice && selectedProject.modelUrl && (
@@ -237,7 +237,7 @@ export function Portfolio() {
                         onClick={() => setShowAR(true)}
                       >
                         <Smartphone size={16} />
-                        View in AR
+                        Смотреть в AR
                       </button>
                     )}
                   </div>
@@ -252,7 +252,7 @@ export function Portfolio() {
                 setShowAR(false);
               }}
               className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-black/35 text-white md:right-7 md:top-7"
-              aria-label="Close project"
+              aria-label="Закрыть проект"
             >
               <X size={17} />
             </button>
@@ -275,7 +275,7 @@ export function Portfolio() {
                 className="w-full rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-xs uppercase tracking-[0.22em]"
                 onClick={() => setShowAR(false)}
               >
-                Close AR
+                Закрыть AR
               </button>
             </div>
           </motion.div>
