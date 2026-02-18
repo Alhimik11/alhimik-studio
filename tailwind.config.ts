@@ -29,7 +29,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sora)", "system-ui", "sans-serif"],
-        display: ["var(--font-unbounded)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
         mono: ["var(--font-space-mono)", "ui-monospace", "monospace"],
       },
       backgroundImage: {

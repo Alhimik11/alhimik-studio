@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, Space_Mono, Unbounded } from "next/font/google";
+import { Sora, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
@@ -8,11 +8,6 @@ import { AppProviders } from "@/components/providers/AppProviders";
 const sora = Sora({
   subsets: ["latin"],
   variable: "--font-sora",
-});
-
-const unbounded = Unbounded({
-  subsets: ["latin"],
-  variable: "--font-unbounded",
 });
 
 const spaceMono = Space_Mono({
@@ -52,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" suppressHydrationWarning>
-      <body className={`${sora.variable} ${unbounded.variable} ${spaceMono.variable} font-sans antialiased`}>
+      <body className={`${sora.variable} ${spaceMono.variable} font-sans antialiased`}>
         <AppProviders>
           <a
             href="#main-content"

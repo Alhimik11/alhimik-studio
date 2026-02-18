@@ -10,11 +10,11 @@ import { useAppStore } from "@/lib/store/useAppStore";
 import { useUISound } from "@/lib/sound/useUISound";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 
-const HeroCanvas = dynamic(
-  () => import("@/components/hero/HeroCanvas").then((module) => module.HeroCanvas),
+const HeroWebGPUCanvas = dynamic(
+  () => import("@/components/hero/HeroWebGPUCanvas").then((module) => module.HeroWebGPUCanvas),
   {
     ssr: false,
-    loading: () => <div className="absolute inset-0 bg-gradient-to-br from-[#080413] to-[#170d2b]" />,
+    loading: () => <div className="absolute inset-0 hero-stage" />,
   },
 );
 
@@ -35,12 +35,9 @@ export function Hero() {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 },
-    );
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), {
+      threshold: 0.1,
+    });
 
     observer.observe(sectionRef.current);
     return () => observer.disconnect();
@@ -50,7 +47,6 @@ export function Hero() {
     if (typeof window === "undefined") {
       return;
     }
-
     transmutationShownRef.current = sessionStorage.getItem("transmutation-text-shown") === "1";
   }, []);
 
@@ -82,7 +78,6 @@ export function Hero() {
     }
 
     const element = transmutationRef.current;
-
     const revealTween = gsap.fromTo(
       element,
       { autoAlpha: 0, y: 26 },
@@ -106,15 +101,14 @@ export function Hero() {
   }, [showTransmutationText]);
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen overflow-hidden pb-20 pt-12 sm:pt-16">
+    <section ref={sectionRef} className="hero-stage relative min-h-screen overflow-hidden pb-20 pt-12 sm:pt-16">
       <div className="absolute inset-0">
-        <span className="sr-only">
-          Интерактивная 3D-сцена: анимированный логотип Alhimik Studio с кристаллическими эффектами
-        </span>
-        <HeroCanvas active={isVisible} explodeProgress={explodeProgress} />
+        <span className="sr-only">Интерактивная 3D-сцена на WebGPU: процедурный логотип Alhimik</span>
+        <HeroWebGPUCanvas active={isVisible} explodeProgress={explodeProgress} />
       </div>
 
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(176,118,255,0.23),transparent_40%),radial-gradient(circle_at_82%_72%,rgba(216,182,123,0.21),transparent_36%)]" />
+      <div className="noise-overlay" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(179,121,255,0.28),transparent_42%),radial-gradient(circle_at_82%_76%,rgba(216,182,123,0.18),transparent_35%)]" />
 
       {showTransmutationText && (
         <p
@@ -132,24 +126,18 @@ export function Hero() {
             DIGITAL ALCHEMISTS
           </div>
 
-          <div className="space-y-4">
-            <TextReveal
-              as="h1"
-              text="Мы превращаем цифровой свинец в VR, AR и AI-золото"
-              className="text-balance font-display text-[2rem] font-semibold uppercase leading-[0.96] sm:text-[2.8rem] md:text-[3.9rem] lg:text-[4.8rem]"
-              step={0.013}
-            />
-            <p className="max-w-[650px] text-base text-slate-200/92 sm:text-lg md:text-xl">
-              Интерактивный логотип в центре сцены разбирается на детали при скролле и запускает визуальную систему
-              сайта. Так мы показываем идею Alhimik: инженерия, превращенная в магию интерфейсов.
-            </p>
-          </div>
+          <TextReveal
+            as="h1"
+            text="Мы превращаем цифровой свинец в VR, AR и AI-золото"
+            className="text-balance font-display text-[2rem] font-semibold uppercase leading-[0.96] sm:text-[2.8rem] md:text-[3.9rem] lg:text-[4.8rem]"
+            step={0.013}
+          />
 
           <div className="flex flex-wrap items-center gap-4">
             <MagneticButton className="pointer-events-auto" strength={0.22}>
               <Link
                 href="/portfolio"
-                className="inline-flex items-center gap-3 rounded-full border border-cyan-300/35 bg-cyan-500/20 px-7 py-3 text-sm uppercase tracking-[0.2em] text-cyan-100 transition-all hover:bg-cyan-500/34"
+                className="hero-primary-cta inline-flex items-center gap-3 rounded-full border border-cyan-300/35 bg-cyan-500/20 px-7 py-3 text-sm uppercase tracking-[0.2em] text-cyan-100 transition-all hover:bg-cyan-500/34"
                 onMouseEnter={() => {
                   setCursorType("view");
                   playHover();
@@ -161,6 +149,7 @@ export function Hero() {
                 <ArrowUpRight size={16} />
               </Link>
             </MagneticButton>
+
             <MagneticButton className="pointer-events-auto" strength={0.22}>
               <Link
                 href="/contact"
@@ -175,20 +164,6 @@ export function Hero() {
                 Начать проект
               </Link>
             </MagneticButton>
-          </div>
-
-          <div className="grid max-w-[660px] grid-cols-2 gap-4 pt-1 sm:grid-cols-4">
-            {[
-              { metric: "PBR", title: "Материалы в реальном времени" },
-              { metric: "60 FPS", title: "Плавность на средних устройствах" },
-              { metric: "WEBGL", title: "Сцены и шейдеры" },
-              { metric: "PWA", title: "Устанавливаемый формат" },
-            ].map((item) => (
-              <div key={item.title} className="glass-panel rounded-2xl p-4">
-                <p className="font-display text-lg uppercase text-cyan-200">{item.metric}</p>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-mutedext">{item.title}</p>
-              </div>
-            ))}
           </div>
         </div>
       </div>
