@@ -191,6 +191,7 @@ export function HeroWebGPUCanvas({ active, explodeProgress }: HeroWebGPUCanvasPr
 
       logoTexture.anisotropicFilteringLevel = 16;
       logoTexture.vScale = -1;
+      logoTexture.vOffset = 1;
 
       const logoMaterial = new PBRMaterial("logo-material", scene);
       logoMaterial.albedoTexture = logoTexture;
