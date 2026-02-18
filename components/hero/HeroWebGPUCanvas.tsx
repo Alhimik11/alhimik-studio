@@ -7,12 +7,15 @@ import {
   Color4,
   CubeTexture,
   DirectionalLight,
+  DynamicTexture,
   GlowLayer,
   HemisphericLight,
   Mesh,
   MeshBuilder,
   PBRMaterial,
   Scene,
+  StandardMaterial,
+  Texture,
   TransformNode,
   Vector3,
   WebGPUEngine,
@@ -24,6 +27,65 @@ type HeroWebGPUCanvasProps = {
 };
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+
+async function createKeyedLogoTexture(scene: Scene, imagePath: string) {
+  const image = new Image();
+  image.decoding = "async";
+  image.src = imagePath;
+
+  await new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error("Failed to load logo image"));
+  });
+
+  const width = image.naturalWidth || image.width;
+  const height = image.naturalHeight || image.height;
+  const sourceCanvas = document.createElement("canvas");
+  sourceCanvas.width = width;
+  sourceCanvas.height = height;
+  const sourceCtx = sourceCanvas.getContext("2d");
+
+  if (!sourceCtx) {
+    throw new Error("Canvas context not available");
+  }
+
+  sourceCtx.drawImage(image, 0, 0, width, height);
+  const frame = sourceCtx.getImageData(0, 0, width, height);
+  const pixels = frame.data;
+
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i];
+    const g = pixels[i + 1];
+    const b = pixels[i + 2];
+    const maxChannel = Math.max(r, g, b);
+    const minChannel = Math.min(r, g, b);
+    const brightness = (r + g + b) / 3;
+    const chroma = maxChannel - minChannel;
+
+    const alpha = clamp((brightness - 6) * 8 + chroma * 2.6, 0, 255);
+    pixels[i + 3] = alpha;
+  }
+
+  sourceCtx.putImageData(frame, 0, 0);
+
+  const texture = new DynamicTexture(
+    "logo-keyed",
+    { width, height },
+    scene,
+    false,
+    Texture.TRILINEAR_SAMPLINGMODE,
+  );
+
+  const textureCtx = texture.getContext();
+  textureCtx.clearRect(0, 0, width, height);
+  textureCtx.drawImage(sourceCanvas, 0, 0, width, height);
+  texture.hasAlpha = true;
+  texture.wrapU = Texture.CLAMP_ADDRESSMODE;
+  texture.wrapV = Texture.CLAMP_ADDRESSMODE;
+  texture.update(false);
+
+  return texture;
+}
 
 export function HeroWebGPUCanvas({ active, explodeProgress }: HeroWebGPUCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -80,14 +142,14 @@ export function HeroWebGPUCanvas({ active, explodeProgress }: HeroWebGPUCanvasPr
       setGpuState("ready");
       scene = new Scene(engine);
       scene.clearColor = new Color4(0, 0, 0, 0);
-      scene.ambientColor = new Color3(0.12, 0.08, 0.2);
+      scene.ambientColor = new Color3(0.14, 0.09, 0.22);
 
-      const camera = new ArcRotateCamera("hero-camera", -Math.PI / 2, Math.PI / 2.22, 6.4, Vector3.Zero(), scene);
-      camera.fov = 0.76;
-      camera.lowerRadiusLimit = 5.7;
+      const camera = new ArcRotateCamera("hero-camera", -Math.PI / 2, Math.PI / 2.16, 6.55, Vector3.Zero(), scene);
+      camera.fov = 0.72;
+      camera.lowerRadiusLimit = 5.9;
       camera.upperRadiusLimit = 7.8;
-      camera.lowerBetaLimit = 0.95;
-      camera.upperBetaLimit = 1.8;
+      camera.lowerBetaLimit = 1.0;
+      camera.upperBetaLimit = 1.85;
       camera.panningSensibility = 0;
       camera.wheelDeltaPercentage = 0;
 
@@ -95,121 +157,87 @@ export function HeroWebGPUCanvas({ active, explodeProgress }: HeroWebGPUCanvasPr
         "https://assets.babylonjs.com/environments/environmentSpecular.env",
         scene,
       );
-      environmentTexture.rotationY = Math.PI * 0.28;
+      environmentTexture.rotationY = Math.PI * 0.18;
       scene.environmentTexture = environmentTexture;
-      scene.environmentIntensity = 1.45;
+      scene.environmentIntensity = 1.5;
 
       const hemiLight = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
-      hemiLight.intensity = 0.7;
-      hemiLight.diffuse = new Color3(0.67, 0.48, 1);
-      hemiLight.specular = new Color3(0.92, 0.84, 1);
-      hemiLight.groundColor = new Color3(0.12, 0.06, 0.18);
+      hemiLight.intensity = 0.74;
+      hemiLight.diffuse = new Color3(0.72, 0.55, 1.0);
+      hemiLight.specular = new Color3(0.98, 0.9, 1.0);
+      hemiLight.groundColor = new Color3(0.08, 0.04, 0.12);
 
-      const keyLight = new DirectionalLight("key", new Vector3(-0.55, -1, 0.35), scene);
-      keyLight.position = new Vector3(3.4, 4.2, -2);
-      keyLight.intensity = 2.4;
-      keyLight.diffuse = new Color3(0.95, 0.84, 1);
+      const keyLight = new DirectionalLight("key", new Vector3(-0.5, -1, 0.34), scene);
+      keyLight.position = new Vector3(3.4, 4.2, -2.2);
+      keyLight.intensity = 2.15;
+      keyLight.diffuse = new Color3(0.96, 0.85, 0.72);
 
-      const rimLight = new DirectionalLight("rim", new Vector3(0.75, -0.95, -0.45), scene);
-      rimLight.position = new Vector3(-4.5, 2.4, 3.5);
-      rimLight.intensity = 2.1;
-      rimLight.diffuse = new Color3(0.95, 0.78, 0.46);
+      const rimLight = new DirectionalLight("rim", new Vector3(0.78, -0.95, -0.34), scene);
+      rimLight.position = new Vector3(-3.6, 2.6, 3.4);
+      rimLight.intensity = 2.5;
+      rimLight.diffuse = new Color3(0.74, 0.48, 1.0);
 
-      const glowLayer = new GlowLayer("hero-glow", scene, { blurKernelSize: 48 });
-      glowLayer.intensity = 0.6;
+      const glowLayer = new GlowLayer("hero-glow", scene, { blurKernelSize: 64 });
+      glowLayer.intensity = 0.34;
 
-      const goldMaterial = new PBRMaterial("gold", scene);
-      goldMaterial.albedoColor = Color3.FromHexString("#d8b67b");
-      goldMaterial.reflectivityColor = new Color3(0.95, 0.83, 0.6);
-      goldMaterial.metallic = 1;
-      goldMaterial.roughness = 0.2;
-      goldMaterial.environmentIntensity = 1.85;
-      goldMaterial.clearCoat.isEnabled = true;
-      goldMaterial.clearCoat.intensity = 1;
-      goldMaterial.clearCoat.roughness = 0.08;
+      const root = new TransformNode("logo-root", scene);
 
-      const crystalMaterial = new PBRMaterial("crystal", scene);
-      crystalMaterial.albedoColor = Color3.FromHexString("#7d42ff");
-      crystalMaterial.emissiveColor = Color3.FromHexString("#6c31d8").scale(0.4);
-      crystalMaterial.metallic = 0.05;
-      crystalMaterial.roughness = 0.07;
-      crystalMaterial.alpha = 0.58;
-      crystalMaterial.environmentIntensity = 2.2;
-      crystalMaterial.clearCoat.isEnabled = true;
-      crystalMaterial.clearCoat.intensity = 1;
-      crystalMaterial.clearCoat.roughness = 0.05;
-      crystalMaterial.subSurface.isRefractionEnabled = true;
-      crystalMaterial.subSurface.indexOfRefraction = 1.45;
-      crystalMaterial.subSurface.tintColor = Color3.FromHexString("#b379ff");
-      crystalMaterial.subSurface.tintColorAtDistance = 2.4;
+      let logoTexture: Texture;
+      try {
+        logoTexture = await createKeyedLogoTexture(scene, "/logo.png");
+      } catch {
+        logoTexture = new Texture("/logo.png", scene, true, false, Texture.TRILINEAR_SAMPLINGMODE);
+      }
 
-      const root = new TransformNode("alchemy-root", scene);
+      logoTexture.anisotropicFilteringLevel = 16;
+      logoTexture.vScale = -1;
 
-      const outerFrame = MeshBuilder.CreateTorus(
-        "outer-frame",
-        { diameter: 3.7, thickness: 0.28, tessellation: 6 },
+      const logoMaterial = new PBRMaterial("logo-material", scene);
+      logoMaterial.albedoTexture = logoTexture;
+      logoMaterial.useAlphaFromAlbedoTexture = true;
+      logoMaterial.metallic = 0.12;
+      logoMaterial.roughness = 0.5;
+      logoMaterial.environmentIntensity = 1.24;
+      logoMaterial.emissiveColor = new Color3(0.08, 0.05, 0.12);
+      logoMaterial.alphaCutOff = 0.08;
+      logoMaterial.backFaceCulling = false;
+      logoMaterial.forceAlphaTest = true;
+
+      const glowMaterial = new StandardMaterial("logo-glow-material", scene);
+      glowMaterial.emissiveColor = Color3.FromHexString("#b379ff").scale(0.42);
+      glowMaterial.diffuseColor = new Color3(0, 0, 0);
+      glowMaterial.opacityTexture = logoTexture;
+      glowMaterial.disableLighting = true;
+      glowMaterial.alpha = 0.2;
+      glowMaterial.backFaceCulling = false;
+
+      const logoPlane = MeshBuilder.CreatePlane(
+        "logo-plane",
+        { width: 5.45, height: 5.45, sideOrientation: Mesh.DOUBLESIDE },
         scene,
       );
-      outerFrame.parent = root;
-      outerFrame.rotation.set(Math.PI / 2, 0, Math.PI / 6);
-      outerFrame.material = goldMaterial;
+      logoPlane.parent = root;
+      logoPlane.material = logoMaterial;
 
-      const innerFrame = MeshBuilder.CreateTorus(
-        "inner-frame",
-        { diameter: 3.15, thickness: 0.18, tessellation: 6 },
+      const glowPlane = MeshBuilder.CreatePlane(
+        "logo-glow-plane",
+        { width: 5.56, height: 5.56, sideOrientation: Mesh.DOUBLESIDE },
         scene,
       );
-      innerFrame.parent = root;
-      innerFrame.rotation.set(Math.PI / 2, 0, Math.PI / 6);
-      innerFrame.position.z = 0.08;
-      innerFrame.material = crystalMaterial;
-
-      const letterA = new TransformNode("letter-a", scene);
-      letterA.parent = root;
-      letterA.position.set(-0.14, -0.04, 0.2);
-
-      const aLeft = MeshBuilder.CreateBox("a-left", { width: 0.24, height: 1.58, depth: 0.2 }, scene);
-      aLeft.parent = letterA;
-      aLeft.rotation.z = 0.28;
-      aLeft.position.x = -0.35;
-      aLeft.material = goldMaterial;
-
-      const aRight = MeshBuilder.CreateBox("a-right", { width: 0.24, height: 1.58, depth: 0.2 }, scene);
-      aRight.parent = letterA;
-      aRight.rotation.z = -0.28;
-      aRight.position.x = 0.06;
-      aRight.material = goldMaterial;
-
-      const aCross = MeshBuilder.CreateBox("a-cross", { width: 0.56, height: 0.2, depth: 0.2 }, scene);
-      aCross.parent = letterA;
-      aCross.position.set(-0.13, -0.24, 0.02);
-      aCross.material = goldMaterial;
-
-      const letterZ = new TransformNode("letter-z", scene);
-      letterZ.parent = root;
-      letterZ.position.set(0.55, -0.04, 0.34);
-
-      const zTop = MeshBuilder.CreateBox("z-top", { width: 0.86, height: 0.2, depth: 0.2 }, scene);
-      zTop.parent = letterZ;
-      zTop.position.y = 0.45;
-      zTop.material = crystalMaterial;
-
-      const zBottom = MeshBuilder.CreateBox("z-bottom", { width: 0.86, height: 0.2, depth: 0.2 }, scene);
-      zBottom.parent = letterZ;
-      zBottom.position.y = -0.45;
-      zBottom.material = crystalMaterial;
-
-      const zMiddle = MeshBuilder.CreateBox("z-middle", { width: 0.2, height: 1.12, depth: 0.2 }, scene);
-      zMiddle.parent = letterZ;
-      zMiddle.rotation.z = -0.67;
-      zMiddle.material = crystalMaterial;
+      glowPlane.parent = root;
+      glowPlane.position.z = -0.03;
+      glowPlane.material = glowMaterial;
 
       const sparks: Mesh[] = [];
-      const sparkCount = 120;
+      const sparkCount = 110;
+      const sparkMaterial = new StandardMaterial("spark-material", scene);
+      sparkMaterial.emissiveColor = Color3.FromHexString("#d8b67b").scale(0.85);
+      sparkMaterial.diffuseColor = new Color3(0, 0, 0);
+      sparkMaterial.disableLighting = true;
 
       for (let i = 0; i < sparkCount; i += 1) {
         const spark = MeshBuilder.CreateSphere(`spark-${i}`, { diameter: 0.03, segments: 4 }, scene);
-        spark.material = i % 3 === 0 ? goldMaterial : crystalMaterial;
+        spark.material = sparkMaterial;
         sparks.push(spark);
       }
 
@@ -224,47 +252,40 @@ export function HeroWebGPUCanvas({ active, explodeProgress }: HeroWebGPUCanvasPr
 
         const pointer = pointerRef.current;
         const explode = clamp(explodeRef.current, 0, 1);
-        const motion = activeRef.current ? 1 : 0.25;
+        const motion = activeRef.current ? 1 : 0.28;
 
-        const alphaTarget = -Math.PI / 2 + pointer.x * 0.26;
-        const betaTarget = Math.PI / 2.22 - pointer.y * 0.08;
-        const radiusTarget = 6.4 + explode * 1.2;
+        const alphaTarget = -Math.PI / 2 + pointer.x * 0.12;
+        const betaTarget = Math.PI / 2.16 - pointer.y * 0.05;
+        const radiusTarget = 6.55 + explode * 0.6;
 
         camera.alpha += (alphaTarget - camera.alpha) * 0.05 * motion;
         camera.beta += (betaTarget - camera.beta) * 0.05 * motion;
         camera.radius += (radiusTarget - camera.radius) * 0.06 * motion;
 
-        root.rotation.y += (pointer.x * 0.33 + explode * 0.38 - root.rotation.y) * 0.05 * motion;
-        root.rotation.x += (-pointer.y * 0.2 + explode * 0.08 - root.rotation.x) * 0.05 * motion;
-        root.position.y = Math.sin(elapsed * 0.95) * 0.08;
+        root.rotation.y += (pointer.x * 0.16 + explode * 0.08 - root.rotation.y) * 0.06 * motion;
+        root.rotation.x += (-pointer.y * 0.08 + explode * 0.03 - root.rotation.x) * 0.06 * motion;
+        root.position.y = Math.sin(elapsed * 0.94) * 0.07;
+        const scale = 1 + Math.sin(elapsed * 0.7) * 0.01;
+        root.scaling.setAll(scale);
 
-        outerFrame.position.set(explode * 0.92, explode * 0.26, -explode * 0.55);
-        outerFrame.rotation.x = Math.PI / 2 + explode * 0.4;
-        outerFrame.rotation.y = explode * 0.8;
-
-        innerFrame.position.set(-explode * 1.04, -explode * 0.2, explode * 0.66);
-        innerFrame.rotation.x = Math.PI / 2 - explode * 0.35;
-        innerFrame.rotation.y = -explode * 0.72;
-
-        letterA.position.set(-0.14 - explode * 1.24, -0.04 - explode * 0.55, 0.2 + explode * 1.05);
-        letterA.rotation.set(explode * 0.62, -explode * 0.18, explode * 0.38);
-
-        letterZ.position.set(0.55 + explode * 1.36, -0.04 + explode * 0.36, 0.34 + explode * 1.2);
-        letterZ.rotation.set(-explode * 0.56, explode * 0.24, -explode * 0.44);
+        logoPlane.position.x = -explode * 0.08;
+        glowPlane.position.x = explode * 0.08;
+        glowPlane.rotation.z = Math.sin(elapsed * 0.42) * 0.01;
+        glowPlane.scaling.setAll(1.0 + 0.015 + explode * 0.01);
+        glowLayer.intensity = 0.34 + explode * 0.12;
 
         for (let i = 0; i < sparkCount; i += 1) {
           const spark = sparks[i];
           const seed = i / sparkCount;
-          const angle = elapsed * (0.33 + seed * 0.42) + seed * Math.PI * 10;
-          const radius = 2.2 + Math.sin(elapsed * 1.4 + i * 0.37) * 0.32 + explode * 1.1;
+          const angle = elapsed * (0.24 + seed * 0.36) + seed * Math.PI * 9;
+          const radius = 2.75 + Math.sin(elapsed * 1.2 + i * 0.41) * 0.24 + explode * 0.55;
           spark.position.set(
             Math.cos(angle) * radius,
-            Math.sin(elapsed * 1.8 + i * 0.42) * 1.05,
-            Math.sin(angle) * radius * 0.56,
+            Math.sin(elapsed * 1.6 + i * 0.37) * 1.25,
+            Math.sin(angle) * radius * 0.45,
           );
-
-          const scale = 0.35 + Math.sin(elapsed * 2.2 + i) * 0.18;
-          spark.scaling.setAll(Math.max(0.08, scale));
+          const sparkScale = 0.28 + Math.sin(elapsed * 2 + i * 0.3) * 0.1;
+          spark.scaling.setAll(Math.max(0.06, sparkScale));
         }
 
         scene.render();
@@ -273,7 +294,6 @@ export function HeroWebGPUCanvas({ active, explodeProgress }: HeroWebGPUCanvasPr
       const onResize = () => {
         engine?.resize();
       };
-
       window.addEventListener("resize", onResize);
 
       scene.onDisposeObservable.add(() => {
