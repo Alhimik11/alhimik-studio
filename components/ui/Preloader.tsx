@@ -15,6 +15,9 @@ const PHRASES = [
   "Рендер алхимии",
 ];
 
+const RADIUS = 88;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
 export function Preloader() {
   const { active, progress, total } = useProgress();
   const [timeoutReady, setTimeoutReady] = useState(false);
@@ -25,13 +28,8 @@ export function Preloader() {
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setTimeoutReady(true);
-    }, 2600);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
+    const timer = window.setTimeout(() => setTimeoutReady(true), 2600);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -46,7 +44,6 @@ export function Preloader() {
     }
 
     playClick();
-
     const ctx = gsap.context(() => {
       gsap.to(overlayRef.current, {
         yPercent: -104,
@@ -56,19 +53,17 @@ export function Preloader() {
       });
     });
 
-    return () => {
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, [isLoaded, playClick]);
 
+  const normalized = Math.max(0, Math.min(progress, 100));
+
   const phrase = useMemo(() => {
-    const normalized = Math.max(0, Math.min(progress, 100));
-    const index = Math.min(
-      PHRASES.length - 1,
-      Math.floor((normalized / 100) * PHRASES.length),
-    );
+    const index = Math.min(PHRASES.length - 1, Math.floor((normalized / 100) * PHRASES.length));
     return PHRASES[index];
-  }, [progress]);
+  }, [normalized]);
+
+  const dashOffset = CIRCUMFERENCE - (CIRCUMFERENCE * normalized) / 100;
 
   if (hidden) {
     return null;
@@ -81,28 +76,44 @@ export function Preloader() {
       aria-live="polite"
       aria-label="Прелоадер"
     >
-      <div className="w-[min(92vw,680px)] space-y-8 px-4">
-        <p className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-300">
-          Системная загрузка
-        </p>
+      <div className="flex w-[min(92vw,740px)] flex-col items-center gap-8 px-4">
+        <p className="font-mono text-xs uppercase tracking-[0.35em] text-cyan-300">Системная загрузка</p>
 
-        <div className="space-y-2">
-          <p className="text-3xl font-display uppercase tracking-tight text-balance sm:text-5xl">
-            {phrase}
-          </p>
+        <div className="relative grid h-[240px] w-[240px] place-items-center">
+          <svg width="240" height="240" viewBox="0 0 240 240" aria-hidden="true">
+            <defs>
+              <linearGradient id="preloader-stroke-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#b379ff" />
+                <stop offset="100%" stopColor="#d8b67b" />
+              </linearGradient>
+            </defs>
+
+            <circle cx="120" cy="120" r={RADIUS} stroke="rgba(255,255,255,0.14)" strokeWidth="5" fill="none" />
+            <circle
+              cx="120"
+              cy="120"
+              r={RADIUS}
+              stroke="url(#preloader-stroke-gradient)"
+              strokeWidth="6"
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={CIRCUMFERENCE}
+              strokeDashoffset={dashOffset}
+              transform="rotate(-90 120 120)"
+            />
+            <polygon points="120,64 166,146 74,146" fill="none" stroke="url(#preloader-stroke-gradient)" strokeWidth="3" />
+            <circle cx="120" cy="120" r="6" fill="url(#preloader-stroke-gradient)" />
+          </svg>
+
+          <div className="absolute inset-0 grid place-items-center text-center">
+            <p className="font-display text-3xl uppercase text-copper-100">{Math.round(normalized)}%</p>
+            <p className="mt-10 text-[11px] uppercase tracking-[0.22em] text-mutedext">нейро-ядро</p>
+          </div>
+        </div>
+
+        <div className="space-y-2 text-center">
+          <p className="text-2xl font-display uppercase tracking-tight text-balance sm:text-4xl">{phrase}</p>
           <p className="text-sm text-mutedext/90">Загружаются WebGL-ассеты и шейдеры.</p>
-        </div>
-
-        <div className="h-[2px] overflow-hidden bg-white/15">
-          <div
-            className="h-full bg-gradient-to-r from-cyan-400 via-cyan-500 to-copper-400 transition-[width] duration-300"
-            style={{ width: `${Math.min(progress, 100)}%` }}
-          />
-        </div>
-
-        <div className="flex items-center justify-between text-xs tracking-[0.24em] text-mutedext">
-          <span>НЕЙРО-ЯДРО</span>
-          <span>{Math.round(progress)}%</span>
         </div>
       </div>
     </div>

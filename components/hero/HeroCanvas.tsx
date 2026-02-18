@@ -10,9 +10,12 @@ import {
   Noise,
 } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
+import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
 import logoCrystalVertex from "@/shaders/hero/logoCrystal.vert.glsl";
 import logoCrystalFragment from "@/shaders/hero/logoCrystal.frag.glsl";
+import { useAppStore } from "@/lib/store/useAppStore";
+import { TransmutationEffect } from "@/components/hero/TransmutationEffect";
 
 type HeroCanvasProps = {
   active: boolean;
@@ -36,12 +39,11 @@ function CameraRig({ explodeProgress }: { explodeProgress: number }) {
   return null;
 }
 
-function ReactiveParticles() {
+function ReactiveParticles({ count = 1400 }: { count?: number }) {
   const pointsRef = useRef<THREE.Points | null>(null);
   const { pointer } = useThree();
 
   const positions = useMemo(() => {
-    const count = 1400;
     const data = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i += 1) {
@@ -54,7 +56,7 @@ function ReactiveParticles() {
     }
 
     return data;
-  }, []);
+  }, [count]);
 
   useFrame((_, delta) => {
     if (!pointsRef.current) {
@@ -289,11 +291,17 @@ function AlchemyLogo({ explodeProgress }: { explodeProgress: number }) {
 
 export function HeroCanvas({ active, explodeProgress }: HeroCanvasProps) {
   const aberrationOffset = useMemo(() => new THREE.Vector2(0.00075, 0.0012), []);
+  const reducedMotion = useReducedMotion();
+  const deviceTier = useAppStore((state) => state.deviceTier);
+
+  const particleCount = deviceTier === "low" ? 400 : deviceTier === "mid" ? 800 : 1400;
+  const dprRange: [number, number] = deviceTier === "low" ? [1, 1] : deviceTier === "mid" ? [1, 1.4] : [1, 1.8];
+  const enablePostProcessing = deviceTier !== "low";
 
   return (
     <Canvas
-      dpr={[1, 1.8]}
-      frameloop={active ? "always" : "never"}
+      dpr={dprRange}
+      frameloop={active && !reducedMotion ? "always" : "never"}
       gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
       camera={{ position: [0, 0.15, 5.2], fov: 41 }}
     >
@@ -314,20 +322,27 @@ export function HeroCanvas({ active, explodeProgress }: HeroCanvasProps) {
           </mesh>
         </Environment>
 
-        <ReactiveParticles />
+        <ReactiveParticles count={particleCount} />
         <AlchemyLogo explodeProgress={explodeProgress} />
+        {!reducedMotion && <TransmutationEffect explodeProgress={explodeProgress} />}
         <CameraRig explodeProgress={explodeProgress} />
 
-        <EffectComposer multisampling={0}>
-          <Bloom intensity={0.9} luminanceThreshold={0.18} mipmapBlur />
-          <ChromaticAberration
-            blendFunction={BlendFunction.NORMAL}
-            offset={aberrationOffset}
-            radialModulation
-            modulationOffset={0.35}
-          />
-          <Noise opacity={0.05} premultiply blendFunction={BlendFunction.SOFT_LIGHT} />
-        </EffectComposer>
+        {enablePostProcessing && (
+          <EffectComposer multisampling={0}>
+            <Bloom intensity={0.9} luminanceThreshold={0.18} mipmapBlur />
+            {deviceTier === "high" ? (
+              <ChromaticAberration
+                blendFunction={BlendFunction.NORMAL}
+                offset={aberrationOffset}
+                radialModulation
+                modulationOffset={0.35}
+              />
+            ) : (
+              <></>
+            )}
+            <Noise opacity={0.05} premultiply blendFunction={BlendFunction.SOFT_LIGHT} />
+          </EffectComposer>
+        )}
       </Suspense>
     </Canvas>
   );

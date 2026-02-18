@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { TextReveal } from "@/components/ui/TextReveal";
+import { InlineContactForm } from "@/components/cta/InlineContactForm";
 
 export function CTA() {
   return (
@@ -22,19 +21,13 @@ export function CTA() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-cyan-200/35 bg-cyan-400/20 px-6 py-4 text-sm uppercase tracking-[0.2em] text-cyan-100 transition-colors hover:bg-cyan-400/32"
-              >
-                Начать обсуждение
-                <ArrowUpRight size={16} />
-              </Link>
+            <div className="flex flex-col gap-4">
+              <InlineContactForm />
               <a
                 href="mailto:info@alhimik-studio.ru"
-                className="inline-flex items-center justify-center rounded-2xl border border-copper-300/35 bg-copper-400/15 px-6 py-4 text-sm uppercase tracking-[0.2em] text-copper-100 transition-colors hover:bg-copper-400/28"
+                className="text-center text-xs uppercase tracking-[0.18em] text-mutedext transition-colors hover:text-copper-200"
               >
-                info@alhimik-studio.ru
+                Или напишите: info@alhimik-studio.ru
               </a>
             </div>
           </div>

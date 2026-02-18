@@ -70,6 +70,20 @@ export function useUISound() {
     clickSound?.play();
   }, [soundEnabled]);
 
+  useEffect(() => {
+    const onBeforeUnload = () => {
+      hoverSound?.unload();
+      clickSound?.unload();
+      ambientSound?.unload();
+      hoverSound = null;
+      clickSound = null;
+      ambientSound = null;
+      initialized = false;
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, []);
+
   return {
     soundEnabled,
     playHover,

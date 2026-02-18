@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ReactLenis, type LenisRef } from "lenis/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -13,6 +13,15 @@ type Props = {
 
 export function SmoothScrollProvider({ children }: Props) {
   const lenisRef = useRef<LenisRef | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mql.matches);
+    const onChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     const lenis = lenisRef.current?.lenis;
@@ -44,8 +53,8 @@ export function SmoothScrollProvider({ children }: Props) {
       ref={lenisRef}
       root
       options={{
-        lerp: 0.1,
-        syncTouch: true,
+        lerp: prefersReducedMotion ? 1 : 0.1,
+        syncTouch: !prefersReducedMotion,
       }}
     >
       {children}

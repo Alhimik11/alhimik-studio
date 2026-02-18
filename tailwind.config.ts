@@ -21,7 +21,7 @@ const config: Config = {
         },
         copper: {
           200: "#f6e8cb",
-          300: "#e8cf9c",
+          300: "#f0dbb0",
           400: "#d8b67b",
           500: "#bd9655",
           600: "#8d6d39",

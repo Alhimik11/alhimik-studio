@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Glasses, Diamond, BrainCircuit, Building2 } from "lucide-react";
 import { TextReveal } from "@/components/ui/TextReveal";
 import { useAppStore } from "@/lib/store/useAppStore";
 import { useUISound } from "@/lib/sound/useUISound";
@@ -27,6 +27,7 @@ const SERVICES = [
     details:
       "Разрабатываем интерактивные тренажеры с логикой аварийных сценариев, контролем прогресса и аналитикой.",
     variant: "vr" as const,
+    icon: Glasses,
   },
   {
     id: "02",
@@ -35,6 +36,7 @@ const SERVICES = [
     details:
       "Создаем WebXR и мобильные AR-сцены, которые делают демонстрацию продукта понятной и наглядной.",
     variant: "ar" as const,
+    icon: Diamond,
   },
   {
     id: "03",
@@ -43,6 +45,7 @@ const SERVICES = [
     details:
       "Собираем production-flow от концепции до финального контента с контролем качества и брендинга.",
     variant: "ai" as const,
+    icon: BrainCircuit,
   },
   {
     id: "04",
@@ -51,6 +54,7 @@ const SERVICES = [
     details:
       "Проектируем BIM-процессы: координация, clash detection, визуализация и поддержка эксплуатации.",
     variant: "bim" as const,
+    icon: Building2,
   },
 ];
 
@@ -101,7 +105,7 @@ export function Services() {
             Каждый блок реагирует на курсор и подсвечивается неоном.
           </p>
 
-          <div className="grid gap-3">
+          <div className="grid gap-3" role="tablist" aria-label="Услуги студии">
             {SERVICES.map((service, index) => {
               const isActive = activeServiceId === service.id;
               return (
@@ -111,6 +115,9 @@ export function Services() {
                     itemRefs.current[index] = node;
                   }}
                   type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls="service-preview-panel"
                   className={`group w-full rounded-3xl border px-5 py-5 text-left transition-all duration-300 ${
                     isActive
                       ? "glass-panel border-copper-300/45"
@@ -128,8 +135,8 @@ export function Services() {
                   }}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="h-20 w-20 overflow-hidden rounded-2xl border border-copper-300/25">
-                      <ServicePreviewCanvas variant={service.variant} compact />
+                    <div className="grid h-20 w-20 place-items-center rounded-2xl border border-copper-300/25 bg-gradient-to-br from-[#1a0e30] to-[#0d0618]">
+                      <service.icon size={32} className={isActive ? "text-copper-200" : "text-cyan-400/60"} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-start justify-between gap-3">
@@ -155,7 +162,7 @@ export function Services() {
           </div>
         </div>
 
-        <div className="glass-panel sticky top-24 h-fit overflow-hidden rounded-[28px] border-copper-300/28">
+        <div id="service-preview-panel" role="tabpanel" aria-label={activeService.title} className="glass-panel sticky top-24 h-fit overflow-hidden rounded-[28px] border-copper-300/28">
           <div className="relative h-[290px] sm:h-[370px]">
             <ServicePreviewCanvas variant={activeService.variant} />
           </div>

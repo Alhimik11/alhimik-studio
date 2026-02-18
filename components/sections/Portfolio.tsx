@@ -14,13 +14,17 @@ const ARModelViewer = dynamic(
   { ssr: false },
 );
 
+const CaseScene = dynamic(
+  () => import("@/components/portfolio/CaseScene").then((module) => module.CaseScene),
+  { ssr: false },
+);
+
 type Project = {
   id: number;
   title: string;
   category: string;
   summary: string;
   imageUrl: string;
-  previewVideo?: string;
   modelUrl?: string;
   tags: string[];
 };
@@ -32,7 +36,6 @@ const PROJECTS: Project[] = [
     category: "VR / Обучение",
     summary: "Сценарное обучение персонала с системой оценки действий в реальном времени.",
     imageUrl: "/images/portfolio/case-1.svg",
-    previewVideo: "/hero-video.mp4",
     modelUrl: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
     tags: ["Unity", "Realtime", "LMS"],
   },
@@ -42,7 +45,6 @@ const PROJECTS: Project[] = [
     category: "AR / Ритейл",
     summary: "Размещение и примерка товара в пространстве клиента с выбором вариантов.",
     imageUrl: "/images/portfolio/case-2.svg",
-    previewVideo: "/hero-video.mp4",
     modelUrl: "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb",
     tags: ["WebXR", "USDZ", "iOS/Android"],
   },
@@ -68,7 +70,6 @@ const PROJECTS: Project[] = [
     category: "WebGL / Витрина",
     summary: "Промо-сайт продукта с управляемыми материалами и кинематографичной камерой.",
     imageUrl: "/images/portfolio/case-5.svg",
-    previewVideo: "/hero-video.mp4",
     tags: ["Three.js", "GSAP", "R3F"],
   },
   {
@@ -130,7 +131,7 @@ export function Portfolio() {
   }, [activeIndex]);
 
   return (
-    <section id="portfolio" className="px-4 py-24 md:px-7">
+    <section id="portfolio" aria-label="Портфолио проектов" className="px-4 py-24 md:px-7">
       <div className="mx-auto w-full max-w-[1320px] space-y-8">
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div className="space-y-5">
@@ -172,12 +173,12 @@ export function Portfolio() {
             {tunnelCards.map(({ project, index, abs, style }) => {
               const isHovered = hoveredIndex === index;
               const isActive = activeIndex === index;
-              const showVideo = (isHovered || isActive) && Boolean(project.previewVideo);
+              const showScene = (isHovered || isActive) && abs <= 2;
 
               return (
                 <article
                   key={project.id}
-                  className={`absolute h-[78%] w-[min(76vw,540px)] overflow-hidden rounded-3xl border transition-all duration-300 ${
+                  className={`portfolio-card absolute h-[78%] w-[min(76vw,540px)] overflow-hidden rounded-3xl border transition-all duration-300 ${
                     isHovered || isActive
                       ? "border-copper-300/75 shadow-[0_0_40px_rgba(216,182,123,0.34)]"
                       : "border-white/12"
@@ -192,6 +193,13 @@ export function Portfolio() {
                     setHoveredIndex(null);
                     setCursorType("default");
                   }}
+                  onMouseMove={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    e.currentTarget.style.setProperty("--glow-x", `${x}%`);
+                    e.currentTarget.style.setProperty("--glow-y", `${y}%`);
+                  }}
                   onClick={() => {
                     setActiveIndex(index);
                     playClick();
@@ -204,21 +212,13 @@ export function Portfolio() {
                       fill
                       sizes="(max-width: 1024px) 76vw, 540px"
                       className={`object-cover transition-all duration-500 ${
-                        showVideo ? "scale-[1.06] opacity-25" : "opacity-100"
+                        showScene ? "scale-[1.06] opacity-0" : "opacity-100"
                       }`}
                     />
-                    {project.previewVideo && (
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
-                          showVideo ? "opacity-100" : "opacity-0"
-                        }`}
-                      >
-                        <source src={project.previewVideo} type="video/mp4" />
-                      </video>
+                    {showScene && (
+                      <div className="absolute inset-0">
+                        <CaseScene caseId={project.id} active={showScene} />
+                      </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#090413] via-transparent to-transparent" />
                   </div>

@@ -2,11 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes gold-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
 @layer base {
   :root {
     --color-surface: 8 5 18;
     --color-text: 246 239 255;
-    --color-muted: 169 150 196;
+    --color-muted: 195 178 218;
     --color-cyan: 179 121 255;
     --color-copper: 216 182 123;
   }
@@ -39,6 +48,28 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--color-cyan));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    border-color: rgba(179, 121, 255, 0.55);
+    box-shadow: 0 0 0 3px rgba(179, 121, 255, 0.2);
+  }
+
+  button:focus-visible {
+    outline: 2px solid rgba(179, 121, 255, 0.7);
+    outline-offset: 2px;
   }
 }
 
@@ -97,6 +128,45 @@
   .gold-outline-hover:hover {
     color: transparent;
     -webkit-text-stroke: 1px rgba(216, 182, 123, 0.92);
+    background-image: linear-gradient(120deg, rgba(216, 182, 123, 0.25), rgba(255, 243, 219, 0.98), rgba(216, 182, 123, 0.25));
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: gold-shimmer 1.8s linear infinite;
+  }
+
+  .portfolio-card {
+    --glow-x: 50%;
+    --glow-y: 50%;
+    isolation: isolate;
+  }
+
+  .portfolio-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background:
+      radial-gradient(
+        260px circle at var(--glow-x) var(--glow-y),
+        rgba(216, 182, 123, 0.42) 0%,
+        rgba(216, 182, 123, 0.2) 32%,
+        rgba(216, 182, 123, 0.08) 48%,
+        transparent 72%
+      );
+    mix-blend-mode: screen;
+  }
+
+  .portfolio-card:hover::before {
+    opacity: 1;
+  }
+
+  .portfolio-card > * {
+    position: relative;
+    z-index: 2;
   }
 }
 
@@ -167,6 +237,21 @@ html.magic-look button {
 }
 
 @media (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .custom-cursor {
     display: none !important;
   }

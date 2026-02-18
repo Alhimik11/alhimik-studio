@@ -54,8 +54,14 @@ export default function RootLayout({
     <html lang="ru" suppressHydrationWarning>
       <body className={`${sora.variable} ${unbounded.variable} ${spaceMono.variable} font-sans antialiased`}>
         <AppProviders>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[101] focus:rounded-xl focus:border focus:border-cyan-300/50 focus:bg-surface focus:px-5 focus:py-3 focus:text-sm focus:uppercase focus:tracking-[0.2em] focus:text-cyan-200"
+          >
+            Перейти к содержимому
+          </a>
           <Header />
-          <main className="min-h-screen overflow-x-clip pb-28">{children}</main>
+          <main id="main-content" className="min-h-screen overflow-x-clip pb-28">{children}</main>
           <Footer />
         </AppProviders>
       </body>
