@@ -102,10 +102,9 @@ export function Header() {
     <>
       <header className="pointer-events-none fixed inset-x-0 bottom-3 z-50 px-3 sm:bottom-5 sm:px-4">
         <nav
-          className="pointer-events-auto mx-auto flex w-full max-w-[1120px] items-center justify-between gap-2 rounded-full border bg-[#130a24]/70 px-3 py-2 backdrop-blur-xl transition-colors sm:px-4"
+          className="dock-glass pointer-events-auto mx-auto flex w-full max-w-[1120px] items-center justify-between gap-2 rounded-full border border-transparent bg-[#0d0720]/55 px-3 py-2 transition-colors sm:px-4"
           style={{
-            borderColor: navBorderColor,
-            boxShadow: `0 0 32px ${navGlowColor}`,
+            boxShadow: `0 0 36px ${navGlowColor}, inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 30px rgba(140,84,246,0.06)`,
           }}
         >
           <MagneticButton className="hidden sm:block" strength={0.2}>
@@ -152,10 +151,10 @@ export function Header() {
             <MagneticButton strength={0.15}>
               <button
                 type="button"
-                className={`grid h-10 w-10 place-items-center rounded-full border transition-colors ${
+                className={`grid h-10 w-10 place-items-center rounded-full border backdrop-blur-sm transition-colors ${
                   magicLookEnabled
-                    ? "border-copper-300/50 bg-copper-400/20 text-copper-200"
-                    : "border-white/15 bg-white/5 text-white hover:border-cyan-400/50 hover:text-cyan-200"
+                    ? "border-copper-300/50 bg-copper-400/20 text-copper-200 shadow-[inset_0_0_12px_rgba(216,182,123,0.1)]"
+                    : "border-white/15 bg-white/7 text-white shadow-[inset_0_0_12px_rgba(140,84,246,0.06)] hover:border-cyan-400/50 hover:text-cyan-200"
                 }`}
                 onClick={() => {
                   toggleMagicLook();
@@ -172,7 +171,7 @@ export function Header() {
             <MagneticButton strength={0.15}>
               <button
                 type="button"
-                className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:border-cyan-400/50 hover:text-cyan-200"
+                className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/7 text-white shadow-[inset_0_0_12px_rgba(140,84,246,0.06)] backdrop-blur-sm transition-colors hover:border-cyan-400/50 hover:text-cyan-200"
                 onClick={() => {
                   toggleSound();
                   playClick();
@@ -188,7 +187,7 @@ export function Header() {
             <MagneticButton className="md:hidden" strength={0.15}>
               <button
                 type="button"
-                className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:border-cyan-400/50 hover:text-cyan-200"
+                className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/7 text-white shadow-[inset_0_0_12px_rgba(140,84,246,0.06)] backdrop-blur-sm transition-colors hover:border-cyan-400/50 hover:text-cyan-200"
                 onClick={() => setIsMenuOpen((value) => !value)}
                 onMouseEnter={onEnter}
                 onMouseLeave={onLeave}
@@ -202,7 +201,7 @@ export function Header() {
       </header>
 
       {isMenuOpen && (
-        <div className="fixed bottom-16 left-1/2 z-50 w-[calc(100%-1.5rem)] max-w-[420px] -translate-x-1/2 rounded-3xl border border-copper-400/30 bg-[#120a22]/92 p-3 backdrop-blur-xl md:hidden">
+        <div className="fixed bottom-16 left-1/2 z-50 w-[calc(100%-1.5rem)] max-w-[420px] -translate-x-1/2 rounded-3xl border border-copper-400/30 bg-[#0d0720]/80 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_0_40px_rgba(140,84,246,0.06),0_16px_48px_rgba(6,3,13,0.5)] backdrop-blur-[32px] md:hidden">
           <div className="grid gap-2">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;

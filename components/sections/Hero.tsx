@@ -108,7 +108,9 @@ export function Hero() {
       </div>
 
       <div className="noise-overlay" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(179,121,255,0.28),transparent_42%),radial-gradient(circle_at_82%_76%,rgba(216,182,123,0.18),transparent_35%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(159,98,255,0.32),transparent_48%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(179,121,255,0.22),transparent_42%),radial-gradient(circle_at_82%_76%,rgba(216,182,123,0.15),transparent_35%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(5,2,8,0.72)_100%)]" />
 
       {showTransmutationText && (
         <p
@@ -128,16 +130,20 @@ export function Hero() {
 
           <TextReveal
             as="h1"
-            text="Мы превращаем цифровой свинец в VR, AR и AI-золото"
-            className="text-balance font-display text-[2rem] font-semibold uppercase leading-[0.96] sm:text-[2.8rem] md:text-[3.9rem] lg:text-[4.8rem]"
-            step={0.013}
+            text="Мы проектируем реальность"
+            className="font-display font-bold uppercase leading-[0.92]"
+            style={{ fontSize: "clamp(2.6rem, 7.5vw + 0.5rem, 7.2rem)" }}
+            step={0.025}
           />
+          <p className="max-w-[680px] text-balance text-base text-mutedext sm:text-lg md:text-xl">
+            Превращаем цифровой свинец в&nbsp;VR,&nbsp;AR и&nbsp;AI&#8209;золото
+          </p>
 
           <div className="flex flex-wrap items-center gap-4">
             <MagneticButton className="pointer-events-auto" strength={0.22}>
               <Link
                 href="/portfolio"
-                className="hero-primary-cta inline-flex items-center gap-3 rounded-full border border-cyan-300/35 bg-cyan-500/20 px-7 py-3 text-sm uppercase tracking-[0.2em] text-cyan-100 transition-all hover:bg-cyan-500/34"
+                className="hero-primary-cta inline-flex items-center gap-3 rounded-full border border-cyan-300/35 bg-cyan-500/20 px-7 py-3 text-sm uppercase tracking-[0.2em] text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),inset_0_0_16px_rgba(140,84,246,0.08)] backdrop-blur-sm transition-all hover:bg-cyan-500/34"
                 onMouseEnter={() => {
                   setCursorType("view");
                   playHover();
@@ -153,7 +159,7 @@ export function Hero() {
             <MagneticButton className="pointer-events-auto" strength={0.22}>
               <Link
                 href="/contact"
-                className="rounded-full border border-copper-300/45 bg-copper-400/18 px-7 py-3 text-sm uppercase tracking-[0.2em] text-copper-100 transition-all hover:bg-copper-400/28"
+                className="rounded-full border border-copper-300/45 bg-copper-400/18 px-7 py-3 text-sm uppercase tracking-[0.2em] text-copper-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_0_16px_rgba(216,182,123,0.06)] backdrop-blur-sm transition-all hover:bg-copper-400/28"
                 onMouseEnter={() => {
                   setCursorType("hover");
                   playHover();
