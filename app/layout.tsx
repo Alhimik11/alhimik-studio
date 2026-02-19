@@ -19,17 +19,16 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://alhimik-studio.ru"),
   title: {
-    default: "Alhimik Studio | Иммерсивные VR, AR и AI-проекты",
+    default: "Alhimik Studio | Иммерсивные AI, VR и AR-проекты",
     template: "%s | Alhimik Studio",
   },
   description:
-    "Креативная студия разработки: кинематографичные веб-сцены, 3D в реальном времени, VR/AR-интерактив и AI-визуализации.",
-  keywords: ["VR", "AR", "WebGL", "Three.js", "3D в реальном времени", "AI-видео", "Иммерсивный веб"],
+    "Креативная студия разработки: кинематографичные веб-сцены, 3D в реальном времени, AI-визуализации и VR/AR-интерактив.",
+  keywords: ["AI", "VR", "AR", "WebGL", "Three.js", "3D в реальном времени", "AI-видео", "Иммерсивный веб"],
   manifest: "/manifest.webmanifest",
   openGraph: {
     title: "Alhimik Studio",
-    description:
-      "Иммерсивные веб-решения на базе 3D в реальном времени, AR, VR и AI-визуалов.",
+    description: "Иммерсивные веб-решения на базе 3D в реальном времени, AI, VR/AR и интерактивных визуалов.",
     url: "https://alhimik-studio.ru",
     siteName: "Alhimik Studio",
     locale: "ru_RU",
@@ -56,7 +55,9 @@ export default function RootLayout({
             Перейти к содержимому
           </a>
           <Header />
-          <main id="main-content" className="min-h-screen overflow-x-clip pb-28">{children}</main>
+          <main id="main-content" className="min-h-screen overflow-x-clip pb-28">
+            {children}
+          </main>
           <Footer />
         </AppProviders>
       </body>

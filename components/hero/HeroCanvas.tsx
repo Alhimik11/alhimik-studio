@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import {
@@ -30,13 +30,30 @@ function CameraRig({ explodeProgress }: { explodeProgress: number }) {
   const { camera, pointer } = useThree();
 
   useFrame((_, delta) => {
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, pointer.x * 0.5, 3.5, delta);
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, pointer.x * 0.3, 3.5, delta);
     camera.position.y = THREE.MathUtils.damp(camera.position.y, pointer.y * 0.34, 3.5, delta);
     camera.position.z = THREE.MathUtils.damp(camera.position.z, 5.2 + explodeProgress * 1.25, 3, delta);
     camera.lookAt(0, 0, 0);
   });
 
   return null;
+}
+
+function StageOffset({ children }: { children: ReactNode }) {
+  const groupRef = useRef<THREE.Group | null>(null);
+  const { viewport, pointer } = useThree();
+
+  useFrame((_, delta) => {
+    if (!groupRef.current) {
+      return;
+    }
+
+    const viewportOffset = Math.min(0.82, viewport.width * 0.11);
+    const targetX = viewportOffset + pointer.x * 0.08;
+    groupRef.current.position.x = THREE.MathUtils.damp(groupRef.current.position.x, targetX, 3.4, delta);
+  });
+
+  return <group ref={groupRef}>{children}</group>;
 }
 
 function ReactiveParticles({ count = 1400 }: { count?: number }) {
@@ -115,26 +132,37 @@ function AlchemyLogo({ explodeProgress }: { explodeProgress: number }) {
   }, []);
 
   useFrame((state, delta) => {
-    crystalUniforms.uTime.value = state.clock.getElapsedTime();
+    const elapsed = state.clock.getElapsedTime();
+    crystalUniforms.uTime.value = elapsed;
     if (crystalMaterialRef.current) {
-      crystalMaterialRef.current.uniforms.uTime.value = state.clock.getElapsedTime();
+      crystalMaterialRef.current.uniforms.uTime.value = elapsed;
     }
 
     if (rootRef.current) {
       const pointerY = pointer.y * 0.22;
       const pointerX = pointer.x * 0.25;
+      const idleTiltX = Math.sin(elapsed * 0.44) * 0.08;
+      const idleTiltY = Math.cos(elapsed * 0.36) * 0.1;
+      const pulseScale = 1.18 + Math.sin(elapsed * 0.9) * 0.02;
       rootRef.current.rotation.x = THREE.MathUtils.damp(
         rootRef.current.rotation.x,
-        pointerY + explodeProgress * 0.08,
+        pointerY + idleTiltX + explodeProgress * 0.08,
         4,
         delta,
       );
       rootRef.current.rotation.y = THREE.MathUtils.damp(
         rootRef.current.rotation.y,
-        pointerX + explodeProgress * 0.16,
+        pointerX + idleTiltY + explodeProgress * 0.16,
         4,
         delta,
       );
+      rootRef.current.position.y = THREE.MathUtils.damp(
+        rootRef.current.position.y,
+        Math.sin(elapsed * 0.7) * 0.06,
+        4,
+        delta,
+      );
+      rootRef.current.scale.setScalar(THREE.MathUtils.damp(rootRef.current.scale.x, pulseScale, 4, delta));
     }
 
     const setPose = (
@@ -190,7 +218,17 @@ function AlchemyLogo({ explodeProgress }: { explodeProgress: number }) {
   });
 
   return (
-    <group ref={rootRef}>
+    <group ref={rootRef} scale={1.18}>
+      <sprite position={[0, 0, -0.95]} scale={[4.9, 4.9, 1]}>
+        <spriteMaterial
+          color="#b379ff"
+          opacity={0.22}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </sprite>
+
       <group ref={outerFrameRef}>
         <mesh>
           <ringGeometry args={[1.58, 1.9, 6]} />
@@ -290,7 +328,7 @@ function AlchemyLogo({ explodeProgress }: { explodeProgress: number }) {
 }
 
 export function HeroCanvas({ active, explodeProgress }: HeroCanvasProps) {
-  const aberrationOffset = useMemo(() => new THREE.Vector2(0.00075, 0.0012), []);
+  const aberrationOffset = useMemo(() => new THREE.Vector2(0.0011, 0.0017), []);
   const reducedMotion = useReducedMotion();
   const deviceTier = useAppStore((state) => state.deviceTier);
 
@@ -303,19 +341,19 @@ export function HeroCanvas({ active, explodeProgress }: HeroCanvasProps) {
       dpr={dprRange}
       frameloop={active && !reducedMotion ? "always" : "never"}
       gl={{ antialias: true, powerPreference: "high-performance", alpha: true }}
-      camera={{ position: [0, 0.15, 5.2], fov: 41 }}
+      camera={{ position: [0, 0.15, 5.1], fov: 40 }}
     >
       <color attach="background" args={["#080413"]} />
       <fogExp2 attach="fog" args={["#0b0718", 0.17]} />
 
       <Suspense fallback={null}>
-        <ambientLight intensity={0.42} />
-        <pointLight position={[2.6, 2.2, 2.1]} color="#b783ff" intensity={40} distance={8} decay={2.1} />
-        <pointLight position={[-2.4, -2.2, 1.5]} color="#d5b575" intensity={28} distance={8} decay={2.1} />
+        <ambientLight intensity={0.5} />
+        <pointLight position={[2.6, 2.2, 2.1]} color="#b783ff" intensity={52} distance={9} decay={2.1} />
+        <pointLight position={[-2.4, -2.2, 1.5]} color="#d5b575" intensity={38} distance={9} decay={2.1} />
 
         <Environment resolution={128}>
-          <Lightformer intensity={2.4} color="#b783ff" position={[0, 2.1, 2]} scale={[3.6, 3.6, 1]} />
-          <Lightformer intensity={1.8} color="#d5b575" position={[-1.8, -1.4, 2]} scale={[2.2, 2.2, 1]} />
+          <Lightformer intensity={3.5} color="#b783ff" position={[0, 2.1, 2]} scale={[3.8, 3.8, 1]} />
+          <Lightformer intensity={2.7} color="#d5b575" position={[-1.8, -1.4, 2]} scale={[2.5, 2.5, 1]} />
           <mesh scale={18}>
             <sphereGeometry args={[1, 32, 32]} />
             <meshBasicMaterial side={THREE.BackSide} color="#12091f" />
@@ -323,13 +361,15 @@ export function HeroCanvas({ active, explodeProgress }: HeroCanvasProps) {
         </Environment>
 
         <ReactiveParticles count={particleCount} />
-        <AlchemyLogo explodeProgress={explodeProgress} />
-        {!reducedMotion && <TransmutationEffect explodeProgress={explodeProgress} />}
+        <StageOffset>
+          <AlchemyLogo explodeProgress={explodeProgress} />
+          {!reducedMotion && <TransmutationEffect explodeProgress={explodeProgress} />}
+        </StageOffset>
         <CameraRig explodeProgress={explodeProgress} />
 
         {enablePostProcessing && (
           <EffectComposer multisampling={0}>
-            <Bloom intensity={0.9} luminanceThreshold={0.18} mipmapBlur />
+            <Bloom intensity={1.45} luminanceThreshold={0.08} luminanceSmoothing={0.35} mipmapBlur />
             {deviceTier === "high" ? (
               <ChromaticAberration
                 blendFunction={BlendFunction.NORMAL}

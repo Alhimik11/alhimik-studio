@@ -5,13 +5,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import gsap from "gsap";
-import { TextReveal } from "@/components/ui/TextReveal";
 import { useAppStore } from "@/lib/store/useAppStore";
 import { useUISound } from "@/lib/sound/useUISound";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 
-const HeroWebGPUCanvas = dynamic(
-  () => import("@/components/hero/HeroWebGPUCanvas").then((module) => module.HeroWebGPUCanvas),
+const HeroCanvas = dynamic(
+  () => import("@/components/hero/HeroCanvas").then((module) => module.HeroCanvas),
   {
     ssr: false,
     loading: () => <div className="absolute inset-0 hero-stage" />,
@@ -102,15 +101,15 @@ export function Hero() {
 
   return (
     <section ref={sectionRef} className="hero-stage relative min-h-screen overflow-hidden pb-20 pt-12 sm:pt-16">
-      <div className="absolute inset-0">
-        <span className="sr-only">Интерактивная 3D-сцена на WebGPU: процедурный логотип Alhimik</span>
-        <HeroWebGPUCanvas active={isVisible} explodeProgress={explodeProgress} />
+      <div className="absolute inset-0 z-0">
+        <span className="sr-only">Интерактивная R3F-сцена с логотипом Alhimik</span>
+        <HeroCanvas active={isVisible} explodeProgress={explodeProgress} />
       </div>
 
-      <div className="noise-overlay" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(159,98,255,0.32),transparent_48%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_22%,rgba(179,121,255,0.22),transparent_42%),radial-gradient(circle_at_82%_76%,rgba(216,182,123,0.15),transparent_35%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(5,2,8,0.72)_100%)]" />
+      <div className="noise-overlay z-[1]" />
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(circle_at_50%_42%,rgba(159,98,255,0.32),transparent_48%)]" />
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(circle_at_18%_22%,rgba(179,121,255,0.22),transparent_42%),radial-gradient(circle_at_82%_76%,rgba(216,182,123,0.15),transparent_35%)]" />
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(5,2,8,0.72)_100%)]" />
 
       {showTransmutationText && (
         <p
@@ -121,25 +120,27 @@ export function Hero() {
         </p>
       )}
 
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[1320px] items-end px-4 pb-28 sm:pb-32 md:px-7">
-        <div className="max-w-[820px] space-y-7">
+      <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[1320px] items-end px-4 pb-28 sm:pb-32 md:px-7">
+        <div className="max-w-[560px] space-y-7">
           <div className="inline-flex items-center gap-3 rounded-full border border-cyan-300/35 bg-cyan-500/12 px-5 py-2 text-xs uppercase tracking-[0.3em] text-cyan-200">
             <Sparkles size={14} />
             DIGITAL ALCHEMISTS
           </div>
 
-          <TextReveal
-            as="h1"
-            text="Мы проектируем реальность"
-            className="font-display font-bold uppercase leading-[0.92]"
-            style={{ fontSize: "clamp(2.6rem, 7.5vw + 0.5rem, 7.2rem)" }}
-            step={0.025}
-          />
-          <p className="max-w-[680px] text-balance text-base text-mutedext sm:text-lg md:text-xl">
-            Превращаем цифровой свинец в&nbsp;VR,&nbsp;AR и&nbsp;AI&#8209;золото
-          </p>
+          <h1
+            className="font-display font-bold uppercase leading-[0.88]"
+            style={{ fontSize: "clamp(1.35rem, 3.3vw + 0.2rem, 3.8rem)" }}
+          >
+            Мы превращаем
+            <br />
+            <span className="text-copper-200 [text-shadow:0_0_24px_rgba(216,182,123,0.36)]">цифровой свинец</span>
+            <br />
+            в AI · VR · AR
+            <br />
+            <span className="headline-gradient">золото</span>
+          </h1>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="pointer-events-none flex flex-wrap items-center gap-4">
             <MagneticButton className="pointer-events-auto" strength={0.22}>
               <Link
                 href="/portfolio"

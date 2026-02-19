@@ -4,8 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Alhimik Studio",
     short_name: "Alhimik",
-    description:
-      "Иммерсивная студия: VR, AR, AI-опыт, 3D-шоукейсы и интерактивные цифровые продукты.",
+    description: "Иммерсивная студия: AI, VR, AR-опыт, 3D-шоукейсы и интерактивные цифровые продукты.",
     start_url: "/",
     display: "standalone",
     background_color: "#07080d",

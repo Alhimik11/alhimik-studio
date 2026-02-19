@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -8,6 +9,7 @@ import { ArrowUpRight, Glasses, Diamond, BrainCircuit, Building2 } from "lucide-
 import { TextReveal } from "@/components/ui/TextReveal";
 import { useAppStore } from "@/lib/store/useAppStore";
 import { useUISound } from "@/lib/sound/useUISound";
+import { SERVICE_CATALOG } from "@/lib/content/serviceCatalog";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,49 +18,28 @@ const ServicePreviewCanvas = dynamic(
   { ssr: false },
 );
 
-const SERVICES = [
-  {
-    id: "01",
-    title: "VR-ТРЕНАЖЕРЫ",
-    short: "Сценарные симуляции и обучение персонала в иммерсивной среде.",
-    details:
-      "Проектируем VR-среды, где обучение проходит через действия: аварийные сценарии, контроль прогресса и аналитику в реальном времени.",
-    variant: "vr" as const,
-    icon: Glasses,
-  },
-  {
-    id: "02",
-    title: "AR-ОПЫТ ПРОДУКТА",
-    short: "Просмотр и примерка товара в пространстве пользователя.",
-    details:
-      "Создаем WebXR и мобильные AR-сцены, которые делают демонстрацию продукта понятной, наглядной и интерактивной.",
-    variant: "ar" as const,
-    icon: Diamond,
-  },
-  {
-    id: "03",
-    title: "AI-ПРОДАКШН",
-    short: "Генеративные пайплайны для визуалов, роликов и контент-систем.",
-    details:
-      "Собираем production-flow от идеи до финального материала с контролем качества, стиля и бренд-идентичности.",
-    variant: "ai" as const,
-    icon: BrainCircuit,
-  },
-  {
-    id: "04",
-    title: "BIM-ИНЖЕНЕРИЯ",
-    short: "Цифровые модели зданий, координация и управление данными.",
-    details:
-      "Настраиваем BIM-процессы: координацию команд, clash detection, визуализацию и сопровождение на этапе эксплуатации.",
-    variant: "bim" as const,
-    icon: Building2,
-  },
-];
+const ICON_MAP = {
+  vr: Glasses,
+  ar: Diamond,
+  ai: BrainCircuit,
+  bim: Building2,
+};
+
+const SERVICE_PRIORITY: Record<string, number> = {
+  ai: 0,
+  vr: 1,
+  ar: 2,
+  bim: 3,
+};
 
 export function Services() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
-  const [activeServiceId, setActiveServiceId] = useState(SERVICES[0].id);
+  const orderedServices = useMemo(
+    () => [...SERVICE_CATALOG].sort((a, b) => SERVICE_PRIORITY[a.variant] - SERVICE_PRIORITY[b.variant]),
+    [],
+  );
+  const [activeServiceId, setActiveServiceId] = useState(orderedServices[0]?.id ?? SERVICE_CATALOG[0].id);
   const setCursorType = useAppStore((state) => state.setCursorType);
   const { playHover, playClick } = useUISound();
 
@@ -88,23 +69,28 @@ export function Services() {
     <section ref={sectionRef} id="services" className="relative px-4 py-24 md:px-7">
       <div className="mx-auto grid w-full max-w-[1320px] gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
         <div className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-200/80">CORE CAPABILITIES</p>
+          <p className="text-xs uppercase tracking-[0.32em] text-cyan-200/55">CORE CAPABILITIES</p>
           <TextReveal
             text="НАШИ ВОЗМОЖНОСТИ"
-            className="font-display text-3xl uppercase leading-tight sm:text-4xl md:text-5xl"
+            className="font-display text-4xl uppercase leading-[0.95] text-slate-50 sm:text-5xl md:text-6xl"
             step={0.02}
           />
-          <p className="max-w-md text-lg text-slate-200/90">
+          <p className="max-w-md text-lg text-slate-300/88">
             Мы не просто используем технологии, мы создаем на их базе новые стандарты взаимодействия брендов с
             аудиторией.
           </p>
         </div>
 
-        <div className="relative pb-8">
-          {SERVICES.map((service, index) => {
+        <div className="relative pb-[17rem] md:pb-[23rem]">
+          {orderedServices.map((service, index) => {
             const isActive = activeServiceId === service.id;
-            const Icon = service.icon;
+            const Icon = ICON_MAP[service.variant];
             const topOffset = `calc(6rem + ${index * 0.9}rem)`;
+            const cardNumber = String(index + 1).padStart(2, "0");
+            const badgeClass =
+              service.accent === "gold"
+                ? "border-copper-300/45 bg-copper-400/18 text-copper-100 shadow-[0_0_18px_rgba(216,182,123,0.28)]"
+                : "border-cyan-300/35 bg-cyan-500/14 text-cyan-100";
 
             return (
               <article
@@ -112,31 +98,33 @@ export function Services() {
                 ref={(node) => {
                   cardRefs.current[index] = node;
                 }}
-                className={`service-card-lux group sticky rounded-[30px] p-5 md:p-6 ${
-                  index > 0 ? "mt-[-5.6rem] md:mt-[-7rem]" : "mt-0"
-                }`}
-                style={{ top: topOffset, zIndex: 20 + index }}
+                className={`service-card-lux group sticky rounded-[30px] p-5 transition-transform duration-300 md:p-6 ${
+                  index > 0 ? "mt-[-5.25rem] md:mt-[-6.5rem]" : "mt-0"
+                } ${isActive ? "translate-y-[-0.55rem] scale-[1.015]" : ""}`}
+                style={{ top: topOffset, zIndex: isActive ? 80 + index : 20 + index }}
                 onMouseEnter={() => {
                   setActiveServiceId(service.id);
                   setCursorType("view");
                   playHover();
                 }}
                 onMouseLeave={() => setCursorType("default")}
-                onClick={playClick}
               >
                 <div className="grid gap-5 md:grid-cols-[0.95fr_1.05fr] md:items-center">
                   <div className="space-y-4">
-                    <div className="inline-flex items-center gap-3 rounded-full border border-cyan-300/25 bg-black/25 px-3 py-2 text-xs uppercase tracking-[0.22em] text-cyan-100/90">
+                    <div
+                      className={`inline-flex items-center gap-3 rounded-full border px-3 py-2 text-xs uppercase tracking-[0.22em] ${badgeClass}`}
+                    >
                       <Icon size={14} />
-                      {service.id}
+                      {cardNumber}
                     </div>
                     <h3 className="font-display text-3xl uppercase leading-none text-slate-50 md:text-4xl">
                       {service.title}
                     </h3>
                     <p className="text-base text-slate-100/88">{service.short}</p>
                     <p className="text-sm text-mutedext">{service.details}</p>
-                    <button
-                      type="button"
+                    <Link
+                      href={`/services/${service.slug}`}
+                      onClick={playClick}
                       className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.18em] transition-all ${
                         isActive
                           ? "border-cyan-300/45 bg-cyan-500/18 text-cyan-100 shadow-[0_0_24px_rgba(179,121,255,0.32)]"
@@ -145,7 +133,7 @@ export function Services() {
                     >
                       Подробнее
                       <ArrowUpRight size={14} />
-                    </button>
+                    </Link>
                   </div>
 
                   <div className="service-stage-lux relative h-[270px] overflow-hidden rounded-3xl md:h-[320px]">

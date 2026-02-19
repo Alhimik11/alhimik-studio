@@ -1,4 +1,4 @@
-const CACHE_NAME = "alhimik-v1";
+const CACHE_NAME = "alhimik-v2";
 const PRECACHE_URLS = ["/", "/manifest.webmanifest", "/logo.png"];
 
 self.addEventListener("install", (event) => {

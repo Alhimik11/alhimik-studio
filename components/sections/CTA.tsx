@@ -5,7 +5,7 @@ import { InlineContactForm } from "@/components/cta/InlineContactForm";
 
 export function CTA() {
   return (
-    <section className="px-4 pb-24 pt-8 md:px-7">
+    <section className="relative z-30 px-4 pb-24 pt-8 md:px-7">
       <div className="mx-auto w-full max-w-[1320px]">
         <div className="grain-overlay glass-panel relative overflow-hidden rounded-[34px] border-cyan-300/20 p-7 sm:p-10 md:p-12">
           <div className="pointer-events-none absolute inset-0 bg-aurora opacity-45" />
