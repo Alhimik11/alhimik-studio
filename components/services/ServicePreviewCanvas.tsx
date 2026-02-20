@@ -69,7 +69,7 @@ function VRHeadsetModel({ intensity }: { intensity: number }) {
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.52, 0]} scale={3.66}>
+    <group ref={groupRef} position={[0, -0.52, 0]} scale={7.32}>
       <primitive object={model} />
     </group>
   );
@@ -100,317 +100,390 @@ function ARRobotModel({ intensity }: { intensity: number }) {
 }
 
 function AINetwork({ intensity }: { intensity: number }) {
-  const groupRef = useRef<THREE.Group | null>(null);
-  const pointsGeometryRef = useRef<THREE.BufferGeometry | null>(null);
-  const linesGeometryRef = useRef<THREE.BufferGeometry | null>(null);
-  const dischargeGeometryRef = useRef<THREE.BufferGeometry | null>(null);
-  const sparksGeometryRef = useRef<THREE.BufferGeometry | null>(null);
-  const pointsMaterialRef = useRef<THREE.PointsMaterial | null>(null);
-  const linesMaterialRef = useRef<THREE.LineBasicMaterial | null>(null);
-  const dischargeMaterialRef = useRef<THREE.LineBasicMaterial | null>(null);
-  const sparksMaterialRef = useRef<THREE.PointsMaterial | null>(null);
-  const { pointer } = useThree();
+  const groupRef = useRef<THREE.Group>(null);
+  const nodesRef = useRef<THREE.InstancedMesh>(null);
+  const linesRef = useRef<THREE.LineSegments>(null);
+  const pulsesRef = useRef<THREE.InstancedMesh>(null);
 
-  const {
-    baseNodes,
-    nodePositions,
-    linePositions,
-    edges,
-    discharges,
-    dischargePositions,
-    sparkPositions,
-    cols,
-    rows,
-  } = useMemo(() => {
-    const colsCount = 11;
-    const rowsCount = 7;
-    const spacingX = 0.34;
-    const spacingY = 0.3;
+  const NODE_COUNT = 80;
+  const CONNECTION_DIST = 1.3;
+  const PULSE_COUNT = 25; 
 
-    const nodes: THREE.Vector3[] = [];
-    for (let row = 0; row < rowsCount; row += 1) {
-      for (let col = 0; col < colsCount; col += 1) {
-        nodes.push(
-          new THREE.Vector3(
-            (col - (colsCount - 1) / 2) * spacingX,
-            (row - (rowsCount - 1) / 2) * spacingY,
-            THREE.MathUtils.randFloatSpread(0.18),
-          ),
-        );
-      }
+  const { nodes, connections, pulses } = useMemo(() => {
+    const nodesData = [];
+    for (let i = 0; i < NODE_COUNT; i++) {
+      const phi = Math.acos(-1 + (2 * i) / NODE_COUNT);
+      const theta = Math.sqrt(NODE_COUNT * Math.PI) * phi;
+      const radius = 1.8 + Math.random() * 0.4;
+      
+      const basePos = new THREE.Vector3(
+        radius * Math.cos(theta) * Math.sin(phi),
+        radius * Math.sin(theta) * Math.sin(phi),
+        radius * Math.cos(phi)
+      );
+
+      nodesData.push({
+        basePos,
+        currentPos: basePos.clone(),
+        driftSpeed: 0.2 + Math.random() * 0.5,
+        driftOffset: new THREE.Vector3(Math.random() * 10, Math.random() * 10, Math.random() * 10),
+        pulseSpeed: 1 + Math.random() * 2,
+        pulseOffset: Math.random() * Math.PI * 2,
+      });
     }
 
-    const links: Array<[number, number]> = [];
-    for (let row = 0; row < rowsCount; row += 1) {
-      for (let col = 0; col < colsCount; col += 1) {
-        const index = row * colsCount + col;
-        if (col < colsCount - 1) {
-          links.push([index, index + 1]);
-        }
-        if (row < rowsCount - 1) {
-          links.push([index, index + colsCount]);
-        }
-        if (col < colsCount - 1 && row < rowsCount - 1 && Math.random() > 0.35) {
-          links.push([index, index + colsCount + 1]);
-        }
-        if (col > 0 && row < rowsCount - 1 && Math.random() > 0.52) {
-          links.push([index, index + colsCount - 1]);
+    const connectionsData = [];
+    for (let i = 0; i < NODE_COUNT; i++) {
+      for (let j = i + 1; j < NODE_COUNT; j++) {
+        if (nodesData[i].basePos.distanceTo(nodesData[j].basePos) < CONNECTION_DIST) {
+          connectionsData.push([i, j]);
         }
       }
     }
 
-    const points = new Float32Array(nodes.length * 3);
-    nodes.forEach((node, index) => {
-      const offset = index * 3;
-      points[offset + 0] = node.x;
-      points[offset + 1] = node.y;
-      points[offset + 2] = node.z;
-    });
+    const pulsesData = [];
+    for (let i = 0; i < PULSE_COUNT; i++) {
+      const connIndex = Math.floor(Math.random() * connectionsData.length);
+      const [startNode, endNode] = connectionsData[connIndex];
+      
+      pulsesData.push({
+        source: startNode,
+        target: endNode,
+        progress: Math.random(),
+        speed: 0.02 + Math.random() * 0.03,
+      });
+    }
 
-    const lines = new Float32Array(links.length * 6);
-    links.forEach(([a, b], edgeIndex) => {
-      const offset = edgeIndex * 6;
-      lines[offset + 0] = nodes[a].x;
-      lines[offset + 1] = nodes[a].y;
-      lines[offset + 2] = nodes[a].z;
-      lines[offset + 3] = nodes[b].x;
-      lines[offset + 4] = nodes[b].y;
-      lines[offset + 5] = nodes[b].z;
-    });
-
-    const dischargeCount = 24;
-    const dischargeConfigs = Array.from({ length: dischargeCount }).map(() => ({
-      edgeIndex: THREE.MathUtils.randInt(0, Math.max(links.length - 1, 0)),
-      speed: THREE.MathUtils.randFloat(0.24, 0.62),
-      phase: Math.random(),
-      span: THREE.MathUtils.randFloat(0.08, 0.18),
-    }));
-
-    return {
-      baseNodes: nodes,
-      nodePositions: points,
-      linePositions: lines,
-      edges: links,
-      discharges: dischargeConfigs,
-      dischargePositions: new Float32Array(dischargeCount * 6),
-      sparkPositions: new Float32Array(dischargeCount * 3),
-      cols: colsCount,
-      rows: rowsCount,
-    };
+    return { nodes: nodesData, connections: connectionsData, pulses: pulsesData };
   }, []);
 
-  useFrame((state, delta) => {
-    if (
-      !groupRef.current ||
-      !pointsGeometryRef.current ||
-      !linesGeometryRef.current ||
-      !dischargeGeometryRef.current ||
-      !sparksGeometryRef.current
-    ) {
-      return;
-    }
+  const lineGeometry = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(connections.length * 6);
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    return geo;
+  }, [connections]);
 
-    const pulse = 0.82 + intensity * 0.95;
-    const elapsed = state.clock.elapsedTime;
-    groupRef.current.rotation.y += delta * (0.11 + intensity * 0.16);
-    groupRef.current.rotation.x = THREE.MathUtils.lerp(
-      groupRef.current.rotation.x,
-      Math.sin(elapsed * 0.42) * 0.08 + pointer.y * 0.08,
-      0.06,
-    );
-    groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, pointer.x * 0.18, 0.06);
-    groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, pointer.y * 0.14, 0.06);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
 
-    const attractionX = pointer.x * (0.3 + intensity * 0.22);
-    const attractionY = pointer.y * (0.24 + intensity * 0.18);
+  useFrame((state) => {
+    if (!groupRef.current || !nodesRef.current || !linesRef.current || !pulsesRef.current) return;
+    
+    const t = state.clock.elapsedTime;
+    
+    // -----------------------------------------------------------------
+    // МАГИЯ МЫШИ (Параллакс и вращение)
+    // state.mouse хранит координаты от -1 до +1
+    // Мы комбинируем базовое медленное вращение с позицией мыши
+    // -----------------------------------------------------------------
+    const targetRotationX = (state.mouse.y * 0.5) + (t * 0.05);
+    const targetRotationY = (state.mouse.x * 0.5) + (t * 0.1);
+    
+    // THREE.MathUtils.lerp делает движение плавным (сглаживание 5%)
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotationX, 0.05);
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotationY, 0.05);
 
-    for (let i = 0; i < baseNodes.length; i += 1) {
-      const base = baseNodes[i];
-      const offset = i * 3;
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const gx = col / Math.max(1, cols - 1);
-      const gy = row / Math.max(1, rows - 1);
-      const wavePrimary = Math.sin(elapsed * (0.92 + intensity * 0.4) + gx * 5.8 + gy * 3.1);
-      const waveSecondary = Math.cos(elapsed * (1.16 + intensity * 0.35) + gy * 6.3 - gx * 3.4);
-      const drift = Math.sin(elapsed * 0.62 + col * 0.44 + row * 0.31) * 0.02;
-      const weight = 0.28 + (row % 3) * 0.11 + (col % 2) * 0.07;
+    // Сетка немного "тянется" в сторону курсора
+    groupRef.current.position.x = THREE.MathUtils.lerp(groupRef.current.position.x, state.mouse.x * 0.4, 0.05);
+    groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, state.mouse.y * 0.4, 0.05);
 
-      const targetX = base.x + attractionX * weight + drift;
-      const targetY = base.y + attractionY * weight;
-      const targetZ = base.z + (wavePrimary * 0.13 + waveSecondary * 0.08) * pulse;
 
-      nodePositions[offset + 0] = THREE.MathUtils.lerp(nodePositions[offset + 0], targetX, 0.11);
-      nodePositions[offset + 1] = THREE.MathUtils.lerp(nodePositions[offset + 1], targetY, 0.11);
-      nodePositions[offset + 2] = THREE.MathUtils.lerp(nodePositions[offset + 2], targetZ, 0.11);
-    }
+    // Обновляем узлы (дрейф и пульсация)
+    nodes.forEach((node, i) => {
+      const driftX = Math.sin(t * node.driftSpeed + node.driftOffset.x) * 0.15;
+      const driftY = Math.cos(t * node.driftSpeed + node.driftOffset.y) * 0.15;
+      const driftZ = Math.sin(t * node.driftSpeed + node.driftOffset.z) * 0.15;
+      
+      node.currentPos.set(
+        node.basePos.x + driftX,
+        node.basePos.y + driftY,
+        node.basePos.z + driftZ
+      );
 
-    edges.forEach(([a, b], edgeIndex) => {
-      const offset = edgeIndex * 6;
-      const aOffset = a * 3;
-      const bOffset = b * 3;
-      linePositions[offset + 0] = nodePositions[aOffset + 0];
-      linePositions[offset + 1] = nodePositions[aOffset + 1];
-      linePositions[offset + 2] = nodePositions[aOffset + 2];
-      linePositions[offset + 3] = nodePositions[bOffset + 0];
-      linePositions[offset + 4] = nodePositions[bOffset + 1];
-      linePositions[offset + 5] = nodePositions[bOffset + 2];
+      dummy.position.copy(node.currentPos);
+      const scale = 1 + Math.sin(t * node.pulseSpeed + node.pulseOffset) * 0.4;
+      dummy.scale.set(scale, scale, scale);
+      dummy.updateMatrix();
+      nodesRef.current!.setMatrixAt(i, dummy.matrix);
     });
+    nodesRef.current.instanceMatrix.needsUpdate = true;
 
-    const edgeCount = Math.max(edges.length, 1);
-    discharges.forEach((discharge, dischargeIndex) => {
-      const progress = (elapsed * discharge.speed + discharge.phase) % 1;
-      if (progress < 0.018 && Math.random() > 0.72) {
-        discharge.edgeIndex = THREE.MathUtils.randInt(0, edgeCount - 1);
+    // Обновляем линии
+    const positions = linesRef.current.geometry.attributes.position.array as Float32Array;
+    let posIdx = 0;
+    connections.forEach(([a, b]) => {
+      positions[posIdx++] = nodes[a].currentPos.x;
+      positions[posIdx++] = nodes[a].currentPos.y;
+      positions[posIdx++] = nodes[a].currentPos.z;
+      positions[posIdx++] = nodes[b].currentPos.x;
+      positions[posIdx++] = nodes[b].currentPos.y;
+      positions[posIdx++] = nodes[b].currentPos.z;
+    });
+    linesRef.current.geometry.attributes.position.needsUpdate = true;
+
+    // Обновляем импульсы
+    pulses.forEach((pulse, i) => {
+      pulse.progress += pulse.speed + (intensity * 0.02); 
+      
+      if (pulse.progress >= 1) {
+        pulse.progress = 0;
+        pulse.source = pulse.target;
+        const possibleConnections = connections.filter(c => c[0] === pulse.source || c[1] === pulse.source);
+        if (possibleConnections.length > 0) {
+          const nextConn = possibleConnections[Math.floor(Math.random() * possibleConnections.length)];
+          pulse.target = nextConn[0] === pulse.source ? nextConn[1] : nextConn[0];
+        } else {
+          const randomConn = connections[Math.floor(Math.random() * connections.length)];
+          pulse.source = randomConn[0];
+          pulse.target = randomConn[1];
+        }
       }
 
-      const [a, b] = edges[discharge.edgeIndex % edgeCount] ?? [0, 0];
-      const aOffset = a * 3;
-      const bOffset = b * 3;
-      const tail = Math.max(0, progress - discharge.span);
-      const head = Math.min(1, progress + discharge.span * 0.38);
-      const ax = nodePositions[aOffset + 0];
-      const ay = nodePositions[aOffset + 1];
-      const az = nodePositions[aOffset + 2];
-      const bx = nodePositions[bOffset + 0];
-      const by = nodePositions[bOffset + 1];
-      const bz = nodePositions[bOffset + 2];
-
-      const dischargeOffset = dischargeIndex * 6;
-      dischargePositions[dischargeOffset + 0] = THREE.MathUtils.lerp(ax, bx, tail);
-      dischargePositions[dischargeOffset + 1] = THREE.MathUtils.lerp(ay, by, tail);
-      dischargePositions[dischargeOffset + 2] = THREE.MathUtils.lerp(az, bz, tail);
-      dischargePositions[dischargeOffset + 3] = THREE.MathUtils.lerp(ax, bx, head);
-      dischargePositions[dischargeOffset + 4] = THREE.MathUtils.lerp(ay, by, head);
-      dischargePositions[dischargeOffset + 5] = THREE.MathUtils.lerp(az, bz, head);
-
-      const sparkOffset = dischargeIndex * 3;
-      sparkPositions[sparkOffset + 0] = dischargePositions[dischargeOffset + 3];
-      sparkPositions[sparkOffset + 1] = dischargePositions[dischargeOffset + 4];
-      sparkPositions[sparkOffset + 2] = dischargePositions[dischargeOffset + 5];
+      const sourcePos = nodes[pulse.source].currentPos;
+      const targetPos = nodes[pulse.target].currentPos;
+      dummy.position.lerpVectors(sourcePos, targetPos, pulse.progress);
+      
+      dummy.scale.set(0.6, 0.6, 0.6); 
+      dummy.updateMatrix();
+      pulsesRef.current!.setMatrixAt(i, dummy.matrix);
     });
-
-    pointsGeometryRef.current.attributes.position.needsUpdate = true;
-    linesGeometryRef.current.attributes.position.needsUpdate = true;
-    dischargeGeometryRef.current.attributes.position.needsUpdate = true;
-    sparksGeometryRef.current.attributes.position.needsUpdate = true;
-
-    if (pointsMaterialRef.current) {
-      pointsMaterialRef.current.size = 0.05 + intensity * 0.04;
-      pointsMaterialRef.current.opacity = 0.78 + intensity * 0.18;
-    }
-    if (linesMaterialRef.current) {
-      linesMaterialRef.current.opacity = 0.26 + intensity * 0.22;
-    }
-    if (dischargeMaterialRef.current) {
-      dischargeMaterialRef.current.opacity = 0.58 + intensity * 0.24;
-    }
-    if (sparksMaterialRef.current) {
-      sparksMaterialRef.current.size = 0.09 + intensity * 0.05;
-      sparksMaterialRef.current.opacity = 0.82 + intensity * 0.14;
-    }
+    pulsesRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
     <group ref={groupRef}>
-      <points>
-        <bufferGeometry ref={pointsGeometryRef}>
-          <bufferAttribute attach="attributes-position" args={[nodePositions, 3]} />
-        </bufferGeometry>
-        <pointsMaterial
-          ref={pointsMaterialRef}
-          color="#be84ff"
-          size={0.06}
-          transparent
-          opacity={0.9}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </points>
+      <instancedMesh ref={nodesRef} args={[undefined, undefined, NODE_COUNT]}>
+        <sphereGeometry args={[0.04, 16, 16]} />
+        <meshBasicMaterial color="#a760ff" transparent opacity={0.6} />
+      </instancedMesh>
 
-      <lineSegments>
-        <bufferGeometry ref={linesGeometryRef}>
-          <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
-        </bufferGeometry>
-        <lineBasicMaterial ref={linesMaterialRef} color="#b379ff" transparent opacity={0.3} />
+      <lineSegments ref={linesRef} geometry={lineGeometry}>
+        <lineBasicMaterial color="#7b42cc" transparent opacity={0.25} />
       </lineSegments>
 
-      <lineSegments>
-        <bufferGeometry ref={dischargeGeometryRef}>
-          <bufferAttribute attach="attributes-position" args={[dischargePositions, 3]} />
-        </bufferGeometry>
-        <lineBasicMaterial
-          ref={dischargeMaterialRef}
-          color="#d8b67b"
-          transparent
-          opacity={0.7}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </lineSegments>
-
-      <points>
-        <bufferGeometry ref={sparksGeometryRef}>
-          <bufferAttribute attach="attributes-position" args={[sparkPositions, 3]} />
-        </bufferGeometry>
-        <pointsMaterial
-          ref={sparksMaterialRef}
-          color="#f0d29b"
-          size={0.1}
-          transparent
-          opacity={0.9}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-      </points>
+      <instancedMesh ref={pulsesRef} args={[undefined, undefined, PULSE_COUNT]}>
+        <sphereGeometry args={[0.06, 8, 8]} />
+        {/* HDR Цвет для яркого свечения: значения больше 1 делают объект источником света для Bloom */}
+        <meshBasicMaterial color={[1.5, 3.5, 4.0]} toneMapped={false} />
+      </instancedMesh>
     </group>
   );
 }
-
 function BIMBuild({ intensity }: { intensity: number }) {
-  const barsRef = useRef<Array<THREE.Mesh | null>>([]);
-  const bars = useMemo(() => {
-    return Array.from({ length: 10 }).map((_, index) => ({
-      x: -0.9 + (index % 5) * 0.45,
-      z: -0.5 + Math.floor(index / 5) * 0.5,
-      height: THREE.MathUtils.randFloat(0.5, 1.8),
-    }));
+  const buildingRefs = useRef<Array<THREE.Group | null>>([]);
+  const floorRefs = useRef<Array<Array<THREE.Group | null>>>([]);
+  const crownRefs = useRef<Array<THREE.Mesh | null>>([]);
+  const buildings = useMemo(() => {
+    return [
+      { id: "b1", x: -1.02, z: 0.03, width: 0.21, depth: 0.18, floors: 5, phase: 0.16 },
+      { id: "b2", x: -0.67, z: -0.04, width: 0.26, depth: 0.22, floors: 8, phase: 0.95 },
+      { id: "b3", x: -0.3, z: 0.06, width: 0.24, depth: 0.2, floors: 6, phase: 1.82 },
+      { id: "b4", x: 0.06, z: -0.05, width: 0.28, depth: 0.23, floors: 10, phase: 2.63 },
+      { id: "b5", x: 0.43, z: 0.04, width: 0.23, depth: 0.19, floors: 7, phase: 3.48 },
+      { id: "b6", x: 0.82, z: -0.02, width: 0.31, depth: 0.25, floors: 11, phase: 4.36 },
+    ];
   }, []);
+  const floorStep = 0.18;
 
   useFrame((state) => {
-    barsRef.current.forEach((mesh, index) => {
-      if (!mesh) {
-        return;
+    const elapsed = state.clock.elapsedTime;
+    buildings.forEach((building, buildingIndex) => {
+      const root = buildingRefs.current[buildingIndex];
+      if (root) {
+        root.rotation.y = THREE.MathUtils.lerp(
+          root.rotation.y,
+          Math.sin(elapsed * 0.25 + buildingIndex * 0.8) * 0.025,
+          0.04,
+        );
       }
-      const pulse = 1.2 + intensity * 0.9;
-      const target = Math.abs(Math.sin(state.clock.elapsedTime * pulse + index * 0.4)) * bars[index].height + 0.2;
-      mesh.scale.y = THREE.MathUtils.lerp(mesh.scale.y, target, 0.08);
-      mesh.position.y = mesh.scale.y * 0.22 - 0.4;
+
+      const speed = 0.42 + intensity * 0.28;
+      const timeline = elapsed * speed + building.phase;
+      const triangle = 1 - Math.abs((timeline % 2) - 1);
+      const progress = triangle * triangle * (3 - 2 * triangle);
+      const floorsProgress = progress * (building.floors + 0.85);
+
+      for (let floorIndex = 0; floorIndex < building.floors; floorIndex += 1) {
+        const floorGroup = floorRefs.current[buildingIndex]?.[floorIndex];
+        if (!floorGroup) {
+          continue;
+        }
+
+        const local = THREE.MathUtils.clamp(floorsProgress - floorIndex, 0, 1);
+        const eased = local * local * (3 - 2 * local);
+        floorGroup.visible = eased > 0.01;
+        floorGroup.scale.y = THREE.MathUtils.lerp(floorGroup.scale.y, Math.max(0.001, eased), 0.14);
+        floorGroup.position.y = THREE.MathUtils.lerp(
+          floorGroup.position.y,
+          0.16 + floorIndex * floorStep + floorGroup.scale.y * floorStep * 0.5,
+          0.14,
+        );
+      }
+
+      const crown = crownRefs.current[buildingIndex];
+      if (crown) {
+        const cap = THREE.MathUtils.clamp(floorsProgress - building.floors + 0.1, 0, 1);
+        const capEased = cap * cap * (3 - 2 * cap);
+        crown.visible = capEased > 0.01;
+        crown.scale.y = THREE.MathUtils.lerp(crown.scale.y, Math.max(0.001, capEased), 0.12);
+        crown.position.y = 0.18 + building.floors * floorStep + crown.scale.y * 0.09;
+      }
     });
   });
 
   return (
-    <group>
-      {bars.map((bar, index) => (
-        <mesh
-          // eslint-disable-next-line react/no-array-index-key
-          key={index}
-          ref={(node) => {
-            barsRef.current[index] = node;
-          }}
-          position={[bar.x, -0.2, bar.z]}
-          scale={[1, 0.2, 1]}
-        >
-          <boxGeometry args={[0.26, 0.44, 0.26]} />
-          <meshPhysicalMaterial
-            color="#d6b97f"
-            metalness={0.9}
-            roughness={0.22}
-            emissive="#5a33a2"
-            emissiveIntensity={0.12 + intensity * 0.18}
-          />
-        </mesh>
-      ))}
+    <group position={[0, -0.74, 0]}>
+      {buildings.map((building, buildingIndex) => {
+        return (
+          <group
+            key={building.id}
+            ref={(node) => {
+              buildingRefs.current[buildingIndex] = node;
+            }}
+            position={[building.x, 0, building.z]}
+          >
+            <mesh position={[0, 0.06, 0]} scale={[building.width * 1.4, 0.12, building.depth * 1.35]}>
+              <boxGeometry args={[1, 1, 1]} />
+              <meshPhysicalMaterial
+                color="#7a5ea5"
+                metalness={0.7}
+                roughness={0.35}
+                emissive="#2b1246"
+                emissiveIntensity={0.2}
+              />
+            </mesh>
+
+            {Array.from({ length: building.floors }).map((_, floorIndex) => {
+              const taper = 1 - Math.min(0.22, floorIndex * 0.03);
+              const floorWidth = building.width * taper;
+              const floorDepth = building.depth * (1 - Math.min(0.18, floorIndex * 0.025));
+              const warmWindow = (floorIndex + buildingIndex) % 2 === 0;
+              const windowColor = warmWindow ? "#d8b67b" : "#9f62ff";
+              const windowBase = warmWindow ? "#2d1a08" : "#150b27";
+              const frontCols = Math.max(2, Math.min(5, Math.round(floorWidth * 14)));
+              const sideCols = Math.max(1, Math.min(3, Math.round(floorDepth * 16)));
+              const frontXs = Array.from({ length: frontCols }).map((__, col) =>
+                THREE.MathUtils.lerp(-floorWidth * 0.34, floorWidth * 0.34, col / Math.max(1, frontCols - 1)),
+              );
+              const sideZs = Array.from({ length: sideCols }).map((__, col) =>
+                THREE.MathUtils.lerp(-floorDepth * 0.32, floorDepth * 0.32, col / Math.max(1, sideCols - 1)),
+              );
+              const windowWFront = Math.max(0.026, Math.min(0.058, floorWidth * 0.16));
+              const windowWSide = Math.max(0.022, Math.min(0.05, floorDepth * 0.19));
+              const windowH = 0.062;
+
+              return (
+                <group
+                  key={`${building.id}-floor-${floorIndex}`}
+                  ref={(node) => {
+                    if (!floorRefs.current[buildingIndex]) {
+                      floorRefs.current[buildingIndex] = [];
+                    }
+                    floorRefs.current[buildingIndex][floorIndex] = node;
+                  }}
+                  position={[0, 0.16 + floorIndex * floorStep, 0]}
+                  scale={[1, 0.001, 1]}
+                >
+                  <mesh scale={[floorWidth, floorStep * 0.9, floorDepth]}>
+                    <boxGeometry args={[1, 1, 1]} />
+                    <meshPhysicalMaterial
+                      color="#d6b97f"
+                      metalness={0.9}
+                      roughness={0.24}
+                      clearcoat={0.8}
+                      emissive="#40215f"
+                      emissiveIntensity={0.15 + intensity * 0.16}
+                    />
+                  </mesh>
+
+                  {frontXs.map((x, col) => (
+                    <mesh key={`${building.id}-win-f-${floorIndex}-${col}`} position={[x, 0, floorDepth * 0.505]}>
+                      <planeGeometry args={[windowWFront, windowH]} />
+                      <meshStandardMaterial
+                        color={windowBase}
+                        emissive={windowColor}
+                        emissiveIntensity={0.82 + ((floorIndex + col + buildingIndex) % 2) * 0.35 + intensity * 0.18}
+                        roughness={0.35}
+                        metalness={0.04}
+                      />
+                    </mesh>
+                  ))}
+                  {frontXs.map((x, col) => (
+                    <mesh
+                      key={`${building.id}-win-b-${floorIndex}-${col}`}
+                      position={[x, 0, -floorDepth * 0.505]}
+                      rotation={[0, Math.PI, 0]}
+                    >
+                      <planeGeometry args={[windowWFront, windowH]} />
+                      <meshStandardMaterial
+                        color={windowBase}
+                        emissive={windowColor}
+                        emissiveIntensity={0.78 + ((floorIndex + col + buildingIndex + 1) % 2) * 0.31 + intensity * 0.16}
+                        roughness={0.35}
+                        metalness={0.04}
+                      />
+                    </mesh>
+                  ))}
+                  {sideZs.map((z, col) => (
+                    <mesh
+                      key={`${building.id}-win-l-${floorIndex}-${col}`}
+                      position={[-floorWidth * 0.505, 0, z]}
+                      rotation={[0, -Math.PI / 2, 0]}
+                    >
+                      <planeGeometry args={[windowWSide, windowH]} />
+                      <meshStandardMaterial
+                        color={windowBase}
+                        emissive={windowColor}
+                        emissiveIntensity={0.72 + ((floorIndex + col + buildingIndex) % 2) * 0.28 + intensity * 0.14}
+                        roughness={0.35}
+                        metalness={0.04}
+                      />
+                    </mesh>
+                  ))}
+                  {sideZs.map((z, col) => (
+                    <mesh
+                      key={`${building.id}-win-r-${floorIndex}-${col}`}
+                      position={[floorWidth * 0.505, 0, z]}
+                      rotation={[0, Math.PI / 2, 0]}
+                    >
+                      <planeGeometry args={[windowWSide, windowH]} />
+                      <meshStandardMaterial
+                        color={windowBase}
+                        emissive={windowColor}
+                        emissiveIntensity={0.72 + ((floorIndex + col + buildingIndex + 1) % 2) * 0.24 + intensity * 0.14}
+                        roughness={0.35}
+                        metalness={0.04}
+                      />
+                    </mesh>
+                  ))}
+                </group>
+              );
+            })}
+
+            <mesh
+              ref={(node) => {
+                crownRefs.current[buildingIndex] = node;
+              }}
+              position={[0, 0.18 + building.floors * floorStep, 0]}
+              scale={[building.width * 0.42, 0.001, building.depth * 0.42]}
+            >
+              <boxGeometry args={[1, 1, 1]} />
+              <meshStandardMaterial color="#e3c98f" metalness={0.95} roughness={0.2} />
+            </mesh>
+
+            <mesh position={[building.width * 0.66, 0.32, building.depth * 0.1]} scale={[building.width * 0.46, 0.46, building.depth * 0.6]}>
+              <boxGeometry args={[1, 1, 1]} />
+              <meshPhysicalMaterial
+                color="#b79556"
+                metalness={0.84}
+                roughness={0.26}
+                emissive="#331650"
+                emissiveIntensity={0.18 + intensity * 0.16}
+              />
+            </mesh>
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -452,13 +525,11 @@ export function ServicePreviewCanvas({ variant, compact = false, interactive = f
       <Suspense fallback={null}>
         <VariantObject variant={variant} intensity={intensity} />
       </Suspense>
-      <EffectComposer multisampling={0}>
-        <Bloom
-          intensity={0.35 + intensity * 0.9}
-          luminanceThreshold={0.1}
-          luminanceSmoothing={0.42}
-          mipmapBlur
-          blendFunction={BlendFunction.SCREEN}
+      <EffectComposer enableNormalPass={false} multisampling={8}>
+        <Bloom 
+          luminanceThreshold={1} // Светится только то, что ярче единицы (наши HDR молнии)
+          mipmapBlur={true}      // Красивое, широкое размытие света
+          intensity={1.5}        // Сила свечения
         />
       </EffectComposer>
     </Canvas>

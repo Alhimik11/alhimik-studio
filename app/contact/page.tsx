@@ -74,11 +74,11 @@ export default function ContactPage() {
                   className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-cyan-300/55"
                   defaultValue="webgl"
                 >
-                  <option value="webgl">Интерактивный WebGL-сайт</option>
-                  <option value="vr">VR-проект</option>
-                  <option value="ar">AR-просмотр продукта</option>
-                  <option value="ai">AI-контент пайплайн</option>
-                  <option value="other">Другое</option>
+                  <option value="webgl" className="bg-[#170e2b] text-slate-200 py-2">Интерактивный WebGL-сайт</option>
+                  <option value="vr" className="bg-[#170e2b] text-slate-200 py-2">VR-проект</option>
+                  <option value="ar" className="bg-[#170e2b] text-slate-200 py-2">AR-просмотр продукта</option>
+                  <option value="ai" className="bg-[#170e2b] text-slate-200 py-2">AI-контент пайплайн</option>
+                  <option value="other" className="bg-[#170e2b] text-slate-200 py-2">Другое</option>
                 </select>
               </label>
 

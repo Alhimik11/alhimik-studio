@@ -4,8 +4,9 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Sparkles, Smartphone, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, Smartphone, X, ArrowUpRight } from "lucide-react";
 import { TextReveal } from "@/components/ui/TextReveal";
+import Link from "next/link";
 import { useAppStore } from "@/lib/store/useAppStore";
 import { useUISound } from "@/lib/sound/useUISound";
 
@@ -19,69 +20,9 @@ const CaseScene = dynamic(
   { ssr: false },
 );
 
-type Project = {
-  id: number;
-  title: string;
-  category: string;
-  summary: string;
-  imageUrl: string;
-  modelUrl?: string;
-  tags: string[];
-};
+import { CASE_CATALOG } from "@/lib/content/caseCatalog";
 
-const PROJECTS: Project[] = [
-  {
-    id: 1,
-    title: "VR-тренажер промышленной безопасности",
-    category: "VR / Обучение",
-    summary: "Сценарное обучение персонала с системой оценки действий в реальном времени.",
-    imageUrl: "/images/portfolio/case-1.svg",
-    modelUrl: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
-    tags: ["Unity", "Realtime", "LMS"],
-  },
-  {
-    id: 2,
-    title: "AR-конфигуратор для e-commerce",
-    category: "AR / Ритейл",
-    summary: "Размещение и примерка товара в пространстве клиента с выбором вариантов.",
-    imageUrl: "/images/portfolio/case-2.svg",
-    modelUrl: "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb",
-    tags: ["WebXR", "USDZ", "iOS/Android"],
-  },
-  {
-    id: 3,
-    title: "AI-движок рекламных материалов",
-    category: "AI / Видео",
-    summary: "Генерация концептов, кадров и роликов, связанных с маркетинговой аналитикой.",
-    imageUrl: "/images/portfolio/case-3.svg",
-    tags: ["ComfyUI", "After Effects", "Pipeline"],
-  },
-  {
-    id: 4,
-    title: "BIM-платформа цифрового двойника",
-    category: "BIM / Данные",
-    summary: "Единая BIM-экосистема для координации, проверок коллизий и отчетности.",
-    imageUrl: "/images/portfolio/case-4.svg",
-    tags: ["Revit", "IFC", "Navisworks"],
-  },
-  {
-    id: 5,
-    title: "Интерактивный цифровой шоурум",
-    category: "WebGL / Витрина",
-    summary: "Промо-сайт продукта с управляемыми материалами и кинематографичной камерой.",
-    imageUrl: "/images/portfolio/case-5.svg",
-    tags: ["Three.js", "GSAP", "R3F"],
-  },
-  {
-    id: 6,
-    title: "XR-инсталляция для музея",
-    category: "XR / Культура",
-    summary: "Иммерсивный сценарий выставки с AR-слоями, сенсорным интерактивом и звуком.",
-    imageUrl: "/images/portfolio/case-6.svg",
-    modelUrl: "https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb",
-    tags: ["Spatial Audio", "WebGL", "Projection"],
-  },
-];
+const PROJECTS = CASE_CATALOG.filter((project) => project.imageUrl);
 
 const clampIndex = (value: number) => {
   const total = PROJECTS.length;
@@ -152,11 +93,10 @@ export function Portfolio() {
                 toggleMagicLook();
                 playClick();
               }}
-              className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${
-                magicLookEnabled
-                  ? "border-copper-300/55 bg-copper-400/18 text-copper-100"
-                  : "border-cyan-300/45 bg-cyan-500/14 text-cyan-100 hover:bg-cyan-500/22"
-              }`}
+              className={`inline-flex items-center gap-2 rounded-full border px-5 py-2 text-xs uppercase tracking-[0.2em] transition-colors ${magicLookEnabled
+                ? "border-copper-300/55 bg-copper-400/18 text-copper-100"
+                : "border-cyan-300/45 bg-cyan-500/14 text-cyan-100 hover:bg-cyan-500/22"
+                }`}
             >
               <Sparkles size={14} />
               {magicLookEnabled ? "Обычный режим" : "Magic Look"}
@@ -178,11 +118,10 @@ export function Portfolio() {
               return (
                 <article
                   key={project.id}
-                  className={`portfolio-card absolute h-[78%] w-[min(76vw,540px)] overflow-hidden rounded-3xl border transition-all duration-300 ${
-                    isHovered || isActive
-                      ? "border-copper-300/75 shadow-[0_0_40px_rgba(216,182,123,0.34)]"
-                      : "border-white/12"
-                  }`}
+                  className={`portfolio-card absolute h-[78%] w-[min(76vw,540px)] overflow-hidden rounded-3xl border transition-all duration-300 ${isHovered || isActive
+                    ? "border-copper-300/75 shadow-[0_0_40px_rgba(216,182,123,0.34)]"
+                    : "border-white/12"
+                    }`}
                   style={style}
                   onMouseEnter={() => {
                     setHoveredIndex(index);
@@ -207,17 +146,16 @@ export function Portfolio() {
                 >
                   <div className="relative h-[68%] overflow-hidden">
                     <Image
-                      src={project.imageUrl}
+                      src={project.imageUrl!}
                       alt={project.title}
                       fill
                       sizes="(max-width: 1024px) 76vw, 540px"
-                      className={`object-cover transition-all duration-500 ${
-                        showScene ? "scale-[1.06] opacity-0" : "opacity-100"
-                      }`}
+                      className={`object-cover transition-all duration-500 ${showScene ? "scale-[1.06] opacity-0" : "opacity-100"
+                        }`}
                     />
                     {showScene && (
                       <div className="absolute inset-0">
-                        <CaseScene caseId={project.id} active={showScene} />
+                        <CaseScene caseId={parseInt(project.id.split('-')[1] || "1")} active={showScene} />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#090413] via-transparent to-transparent" />
@@ -251,9 +189,8 @@ export function Portfolio() {
                   key={project.id}
                   type="button"
                   onClick={() => setActiveIndex(index)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    index === activeIndex ? "w-8 bg-copper-300" : "w-2 bg-white/35"
-                  }`}
+                  className={`h-1.5 rounded-full transition-all ${index === activeIndex ? "w-8 bg-copper-300" : "w-2 bg-white/35"
+                    }`}
                   aria-label={`Перейти к проекту ${index + 1}`}
                 />
               ))}
@@ -281,7 +218,7 @@ export function Portfolio() {
               </h3>
               <p className="text-mutedext">{activeProject.summary}</p>
               <div className="flex flex-wrap gap-2">
-                {activeProject.tags.map((tag) => (
+                {activeProject.tags?.map((tag) => (
                   <span
                     key={tag}
                     className="rounded-full border border-white/16 bg-white/5 px-3 py-1 text-[10px] uppercase tracking-[0.16em]"
@@ -289,6 +226,15 @@ export function Portfolio() {
                     {tag}
                   </span>
                 ))}
+              </div>
+              <div className="flex justify-end mt-4">
+                <Link
+                  href={`/cases/${activeProject.slug}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-500/15 px-6 py-3 text-xs uppercase tracking-[0.2em] text-cyan-100 transition-colors hover:bg-cyan-500/25"
+                >
+                  Читать подробнее
+                  <ArrowUpRight size={14} />
+                </Link>
               </div>
             </div>
             <div className="space-y-3">
@@ -302,9 +248,11 @@ export function Portfolio() {
                   Смотреть в AR
                 </button>
               )}
-              <p className="text-xs uppercase tracking-[0.17em] text-mutedext">
-                На мобильных активна кнопка AR для кейсов с 3D-моделью.
-              </p>
+              {isMobileDevice ? (
+                <p className="text-xs uppercase tracking-[0.17em] text-mutedext">
+                  На мобильных активна кнопка AR для кейсов с 3D-моделью.
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

@@ -128,7 +128,7 @@ export function Hero() {
           </div>
 
           <h1
-            className="font-display font-bold uppercase leading-[0.88]"
+            className="font-display font-bold uppercase leading-[1.04]"
             style={{ fontSize: "clamp(1.35rem, 3.3vw + 0.2rem, 3.8rem)" }}
           >
             Мы превращаем

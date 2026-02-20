@@ -67,15 +67,18 @@ export function Services() {
 
   return (
     <section ref={sectionRef} id="services" className="relative px-4 py-24 md:px-7">
-      <div className="mx-auto grid w-full max-w-[1320px] gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
-        <div className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-          <p className="text-xs uppercase tracking-[0.32em] text-cyan-200/55">CORE CAPABILITIES</p>
+      <div className="mx-auto grid w-full max-w-[1320px] gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14">
+        <div className="space-y-6 lg:sticky lg:top-32 lg:self-start">
+          <div className="flex items-center gap-4">
+            <div className="h-px w-8 bg-gradient-to-r from-cyan-400/80 to-transparent" />
+            <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-200/80">CORE CAPABILITIES</p>
+          </div>
           <TextReveal
             text="НАШИ ВОЗМОЖНОСТИ"
-            className="font-display text-4xl uppercase leading-[0.95] text-slate-50 sm:text-5xl md:text-6xl"
+            className="font-display text-4xl uppercase leading-[0.95] text-slate-50 sm:text-5xl md:text-6xl lg:text-[4rem]"
             step={0.02}
           />
-          <p className="max-w-md text-lg text-slate-300/88">
+          <p className="max-w-md text-lg text-slate-200/95">
             Мы не просто используем технологии, мы создаем на их базе новые стандарты взаимодействия брендов с
             аудиторией.
           </p>
@@ -98,9 +101,8 @@ export function Services() {
                 ref={(node) => {
                   cardRefs.current[index] = node;
                 }}
-                className={`service-card-lux group sticky rounded-[30px] p-5 transition-transform duration-300 md:p-6 ${
-                  index > 0 ? "mt-[-5.25rem] md:mt-[-6.5rem]" : "mt-0"
-                } ${isActive ? "translate-y-[-0.55rem] scale-[1.015]" : ""}`}
+                className={`service-card-lux group sticky rounded-[30px] p-5 transition-transform duration-300 md:p-6 ${index > 0 ? "mt-[-5.25rem] md:mt-[-6.5rem]" : "mt-0"
+                  } ${isActive ? "translate-y-[-0.55rem] scale-[1.015] is-active" : ""}`}
                 style={{ top: topOffset, zIndex: isActive ? 80 + index : 20 + index }}
                 onMouseEnter={() => {
                   setActiveServiceId(service.id);
@@ -125,11 +127,10 @@ export function Services() {
                     <Link
                       href={`/services/${service.slug}`}
                       onClick={playClick}
-                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.18em] transition-all ${
-                        isActive
-                          ? "border-cyan-300/45 bg-cyan-500/18 text-cyan-100 shadow-[0_0_24px_rgba(179,121,255,0.32)]"
-                          : "border-white/15 bg-white/5 text-slate-200/85"
-                      }`}
+                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.18em] transition-all ${isActive
+                        ? "border-cyan-300/45 bg-cyan-500/18 text-cyan-100 shadow-[0_0_24px_rgba(179,121,255,0.32)]"
+                        : "border-white/15 bg-white/5 text-slate-200/85"
+                        }`}
                     >
                       Подробнее
                       <ArrowUpRight size={14} />
