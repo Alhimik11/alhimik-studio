@@ -30,6 +30,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sora)", "system-ui", "sans-serif"],
         display: ["var(--font-display)", "system-ui", "sans-serif"],
+        accent: ["var(--font-unbounded)", "var(--font-display)", "system-ui", "sans-serif"],
         mono: ["var(--font-space-mono)", "ui-monospace", "monospace"],
       },
       backgroundImage: {
