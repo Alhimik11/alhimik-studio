@@ -77,12 +77,12 @@ export function Portfolio() {
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div className="space-y-5">
             <TextReveal
-              text="Портфолио как 3D-туннель кейсов"
+              text="Проекты, которые мы показали до того, как их построили"
               className="font-display text-3xl uppercase leading-tight sm:text-4xl md:text-5xl"
             />
             <p className="max-w-2xl text-mutedext">
-              Вместо плоской сетки: объемная карусель-коридор. Наведите курсор на карточку, чтобы увидеть живое
-              превью, а границы кейса загорятся золотом.
+              Инвестпроекты, курорты, логистика и коммерческая недвижимость Дальнего Востока: 3D-ролики,
+              AI-видео и визуализация для инвесторов, партнёров и покупателей.
             </p>
           </div>
 
@@ -101,9 +101,6 @@ export function Portfolio() {
               <Sparkles size={14} />
               {magicLookEnabled ? "Обычный режим" : "Magic Look"}
             </button>
-            <p className="text-[11px] uppercase tracking-[0.16em] text-mutedext">
-              Или удерживайте пробел для временного wireframe
-            </p>
           </div>
         </div>
 
@@ -113,7 +110,7 @@ export function Portfolio() {
             {tunnelCards.map(({ project, index, abs, style }) => {
               const isHovered = hoveredIndex === index;
               const isActive = activeIndex === index;
-              const showScene = (isHovered || isActive) && abs <= 2;
+              const showScene = Boolean(project.sceneId) && (isHovered || isActive) && abs <= 2;
 
               return (
                 <article
@@ -155,7 +152,7 @@ export function Portfolio() {
                     />
                     {showScene && (
                       <div className="absolute inset-0">
-                        <CaseScene caseId={parseInt(project.id.split('-')[1] || "1")} active={showScene} />
+                        <CaseScene caseId={project.sceneId ?? 1} active={showScene} />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#090413] via-transparent to-transparent" />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
@@ -37,22 +38,29 @@ export default async function CaseDetailPage({ params }: { params: Promise<Param
         notFound();
     }
 
+    const isRealCase = Boolean(project.task);
+    const story = [
+        { label: "Задача", text: project.task },
+        { label: "Решение", text: project.solution },
+        { label: "Результат", text: project.result },
+    ].filter((item) => item.text);
+
     return (
         <div className="px-4 pb-20 pt-28 md:px-7">
             <div className="mx-auto w-full max-w-[1320px]">
                 {/* Header / Back Link */}
                 <div className="mb-10">
                     <Link
-                        href="/services"
+                        href={isRealCase ? "/portfolio" : "/services"}
                         className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.18em] text-slate-300 transition-colors hover:text-cyan-200"
                     >
                         <ArrowLeft size={16} />
-                        Назад к услугам
+                        {isRealCase ? "Назад к портфолио" : "Назад к услугам"}
                     </Link>
                 </div>
 
                 {/* Hero Section */}
-                <section className="glass-panel relative overflow-hidden rounded-[34px] p-8 md:p-14">
+                <section className="glass-panel relative overflow-hidden rounded-[34px] p-6 sm:p-8 md:p-14">
                     <div className="noise-overlay" />
 
                     <div className="relative z-10 grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
@@ -66,9 +74,15 @@ export default async function CaseDetailPage({ params }: { params: Promise<Param
                                 </p>
                             </div>
 
-                            <h1 className="mt-6 font-display text-4xl uppercase leading-[0.95] text-slate-50 sm:text-5xl md:text-6xl lg:text-[4rem]">
+                            <h1 lang="ru" className="mt-6 hyphens-auto break-words font-display text-[1.7rem] uppercase leading-[0.95] text-slate-50 sm:text-5xl md:text-6xl lg:text-[4rem]">
                                 {project.title}
                             </h1>
+
+                            {project.client && (
+                                <p className="mt-4 text-sm uppercase tracking-[0.18em] text-copper-200">
+                                    {project.client}
+                                </p>
+                            )}
 
                             <p className="mt-6 text-xl text-slate-200/90 leading-relaxed [text-wrap:balance]">
                                 {project.summary}
@@ -110,12 +124,22 @@ export default async function CaseDetailPage({ params }: { params: Promise<Param
                                     {project.videoUrl ? (
                                         <video
                                             src={project.videoUrl}
+                                            poster={project.imageUrl}
                                             className="absolute left-0 top-0 h-full w-full object-cover"
                                             controls
                                             autoPlay
                                             muted
                                             loop
                                             playsInline
+                                        />
+                                    ) : project.imageUrl ? (
+                                        <Image
+                                            src={project.imageUrl}
+                                            alt={project.title}
+                                            fill
+                                            priority
+                                            sizes="(max-width: 1024px) 100vw, 680px"
+                                            className="object-cover"
                                         />
                                     ) : (
                                         <div className="absolute inset-0 flex flex-col justify-center items-center opacity-30">
@@ -129,6 +153,38 @@ export default async function CaseDetailPage({ params }: { params: Promise<Param
 
                     </div>
                 </section>
+
+                {story.length > 0 && (
+                    <section className="mt-10 grid gap-4 md:grid-cols-3">
+                        {story.map((item) => (
+                            <article key={item.label} className="glass-panel rounded-3xl p-6 md:p-8">
+                                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">
+                                    {item.label}
+                                </p>
+                                <p className="mt-4 text-base leading-relaxed text-slate-200/90">{item.text}</p>
+                            </article>
+                        ))}
+                    </section>
+                )}
+
+                {project.gallery && project.gallery.length > 0 && (
+                    <section className="mt-10 grid gap-4 sm:grid-cols-2">
+                        {project.gallery.map((src) => (
+                            <div
+                                key={src}
+                                className="relative w-full overflow-hidden rounded-[24px] border border-white/10 pt-[56.25%]"
+                            >
+                                <Image
+                                    src={src}
+                                    alt={`${project.title} — кадр`}
+                                    fill
+                                    sizes="(max-width: 640px) 100vw, 640px"
+                                    className="object-cover"
+                                />
+                            </div>
+                        ))}
+                    </section>
+                )}
             </div>
 
             <div className="mt-16">
