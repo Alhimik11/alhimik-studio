@@ -2,7 +2,8 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Sparkles, Smartphone, X, ArrowUpRight } from "lucide-react";
 import { TextReveal } from "@/components/ui/TextReveal";
@@ -38,11 +39,57 @@ export function Portfolio() {
   const toggleMagicLook = useAppStore((state) => state.toggleMagicLook);
   const setCursorType = useAppStore((state) => state.setCursorType);
   const { playHover, playClick } = useUISound();
+  const router = useRouter();
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const activeIndexRef = useRef(activeIndex);
+  activeIndexRef.current = activeIndex;
 
   useEffect(() => {
     const userAgent = navigator.userAgent || "";
     const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
     setIsMobileDevice(isMobileUA);
+  }, []);
+
+  // Mouse wheel / trackpad flips cards; at the first or last card the page scrolls on.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) {
+      return;
+    }
+
+    let accumulated = 0;
+    let lockedUntil = 0;
+
+    const onWheel = (event: WheelEvent) => {
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      const current = activeIndexRef.current;
+      const canMove = delta > 0 ? current < PROJECTS.length - 1 : current > 0;
+      if (!canMove || delta === 0) {
+        accumulated = 0;
+        return;
+      }
+
+      // Keep the page (Lenis) still while the carousel is flipping
+      event.preventDefault();
+      event.stopPropagation();
+
+      const now = performance.now();
+      if (now < lockedUntil) {
+        return;
+      }
+
+      accumulated += delta;
+      if (Math.abs(accumulated) < 40) {
+        return;
+      }
+
+      setActiveIndex(current + (accumulated > 0 ? 1 : -1));
+      accumulated = 0;
+      lockedUntil = now + 450;
+    };
+
+    stage.addEventListener("wheel", onWheel, { passive: false });
+    return () => stage.removeEventListener("wheel", onWheel);
   }, []);
 
   const activeProject = PROJECTS[activeIndex];
@@ -104,9 +151,14 @@ export function Portfolio() {
           </div>
         </div>
 
-        <div className="relative h-[560px] overflow-hidden rounded-[34px] border border-copper-400/26 bg-[#120920]/70 p-4 sm:p-6 [perspective:2200px]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(164,97,255,0.22),transparent_35%),radial-gradient(circle_at_86%_78%,rgba(216,182,123,0.15),transparent_35%)]" />
-          <div className="relative h-full w-full [transform-style:preserve-3d]">
+        <div
+          ref={stageRef}
+          data-lenis-prevent-wheel
+          className="relative h-[560px] overflow-hidden rounded-[34px] border border-copper-400/26 bg-[#120920]/70 p-4 sm:p-6 [perspective:2200px]"
+        >
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(164,97,255,0.22),transparent_35%),radial-gradient(circle_at_86%_78%,rgba(216,182,123,0.15),transparent_35%)]" />
+          {/* Cards sit behind this plane in 3D; without pointer-events-none it swallows their hover and clicks */}
+          <div className="pointer-events-none relative h-full w-full [transform-style:preserve-3d]">
             {tunnelCards.map(({ project, index, abs, style }) => {
               const isHovered = hoveredIndex === index;
               const isActive = activeIndex === index;
@@ -115,7 +167,7 @@ export function Portfolio() {
               return (
                 <article
                   key={project.id}
-                  className={`portfolio-card absolute h-[78%] w-[min(76vw,540px)] overflow-hidden rounded-3xl border transition-all duration-300 ${isHovered || isActive
+                  className={`portfolio-card pointer-events-auto absolute h-[78%] w-[min(76vw,540px)] cursor-pointer overflow-hidden rounded-3xl border transition-all duration-300 ${isHovered || isActive
                     ? "border-copper-300/75 shadow-[0_0_40px_rgba(216,182,123,0.34)]"
                     : "border-white/12"
                     }`}
@@ -137,8 +189,13 @@ export function Portfolio() {
                     e.currentTarget.style.setProperty("--glow-y", `${y}%`);
                   }}
                   onClick={() => {
-                    setActiveIndex(index);
                     playClick();
+                    // Side card comes to the front; the front card opens its case page
+                    if (isActive && !project.sceneId) {
+                      router.push(`/cases/${project.slug}`);
+                      return;
+                    }
+                    setActiveIndex(index);
                   }}
                 >
                   <div className="relative h-[68%] overflow-hidden">
@@ -147,7 +204,11 @@ export function Portfolio() {
                       alt={project.title}
                       fill
                       sizes="(max-width: 1024px) 76vw, 540px"
-                      className={`object-cover transition-all duration-500 ${showScene ? "scale-[1.06] opacity-0" : "opacity-100"
+                      className={`object-cover transition-all duration-500 ${showScene
+                        ? "scale-[1.06] opacity-0"
+                        : isHovered
+                          ? "scale-[1.06] opacity-100 brightness-110"
+                          : "opacity-100"
                         }`}
                     />
                     {showScene && (
